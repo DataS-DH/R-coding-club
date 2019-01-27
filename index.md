@@ -1,4 +1,9 @@
-## Welcome to GitHub Pages
+## Welcome to Health R coding club.
+
+This is a fornightly coding club talking place every other Friday at 2pm ran out of the Department of Health and Social Care.
+Our next session is on 8th February.
+
+You can sign up on eventbrite to find all the dates and get reminders before each  event.
 
 You can use the [editor on GitHub](https://github.com/DataS-DH/DataS-DH.github.io/edit/master/index.md) to maintain and preview the content for your website in Markdown files.
 
