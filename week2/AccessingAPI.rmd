@@ -1,0 +1,61 @@
+---
+title: "AccessingAPI"
+output: html_document
+---
+
+```{r eval=FALSE}
+setwd("~/Health_R_coding_club/week2")
+```
+
+
+```{r, eval=FALSE}
+install.packages('spotifyr')
+install.packages('kableExtra')
+```
+
+```{r, eval=FALSE}
+library(spotifyr)
+library(tidyverse)
+library(kableExtra)
+```
+
+To be able to access the data from the API you will first need to sign up for [Spotify for Developers here.](https://developer.spotify.com/dashboard/) *You will first need a normal spotify account to do this.*
+
+Once you have a developers account and have created a web app you should be able to access the required id's from your dashboard.
+
+```{r, eval=FALSE}
+#get access to the spotify API.
+id <- "insert client_id"
+secret <- "insert secret client_id"
+Sys.setenv(SPOTIFY_CLIENT_ID = id)
+Sys.setenv(SPOTIFY_CLIENT_SECRET = secret)
+access_token <- spotifyr::get_spotify_access_token()
+```
+
+API allows you to extract data about specific artists, albums, playlists or users.
+```{r, eval=FALSE}
+artist <- spotifyr::get_artist_audio_features('artist')
+```
+
+Here we dowload all the top50 playlists of lots of different countries from one user (the user name is the first argument this can be found by looking at the link to a spotify user profile, yours will probably be your spotify username), and then access all the tracks from these playlists.
+```{r, eval=FALSE, results='hide'}
+top50 <- get_user_playlists("dgeizkipsrsk26i9krksl8wav") %>% get_playlist_tracks()
+#We then use the API to access the feature information about these tracks - this is the information we were looking at last session.
+features <- get_track_audio_features(top50)
+#we then combine this features information with the playlist information to create our dataset.
+top50 <- dplyr::left_join(top50, features, by='track_uri')
+```
+
+Lets do a little cleaning by transforming the variable types from character to factors so we can see the number of unique playlists, artists and tracks in the data.
+
+```{r, eval=FALSE}
+top50$playlist_name <- as.factor(top50$playlist_name)
+top50$artist_name <- as.factor(top50$artist_name)
+top50$track_name <- as.factor(top50$track_name)
+```
+
+The final step is to save the downloaded data in csv format to share with coding group.
+```{r, eval=FALSE}
+write_csv(top50, "top50playlists.csv")
+```
+
