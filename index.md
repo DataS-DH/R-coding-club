@@ -36,3 +36,8 @@ For this weeks session we use data from Spotify's API, this data is provided for
 ### Support or Contact
 
 Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+
+##### [Week 1: Exploring spotify features data](http://htmlpreview.github.com/?https://github.com/DataS-DH/R-coding-club/blob/master/Week1/Spotify_songs.html)
+
+##### [Week 2: Comparing spotify playlists](http://htmlpreview.github.io/?https://github.com/DataS-DH/R-coding-club/blob/master/Week2)
+##### [Week 2 extra: Accessing the Spotify API](http://htmlpreview.github.io/?https://github.com/DataS-DH/R-coding-club/blob/master/Week2/AccessingAPI.html)
