@@ -9,10 +9,14 @@ setwd("~/Health_R_coding_club/R-coding-club/2018-12")
 
 filenames <- list.files(full.names=TRUE)
 
+head(filenames)
+
 #lets look at one file to understand the format of the data
 test <- read.csv(filenames[1], header = TRUE)
-All$Time <- All$Date
-All$Date <- as.POSIXct(All$Time)
+
+#explore the data
+summary(test)
+str(test)
 
 
 All <- lapply(filenames,function(i){
@@ -40,7 +44,8 @@ Ethplot <- ggplot(StopSearchEth, aes(x=reorder(Self.defined.ethnicity, -freq), y
   guides(fill = FALSE) +
   theme(axis.text.x = element_text(hjust = 0)) +
   theme(plot.title=element_text(size = rel(1.2), lineheight = 1, face = "bold"))
-)
+  
+
 ggplotly(Ethplot) %>% layout(showlegend = FALSE)
 
 
@@ -52,10 +57,34 @@ OEthplot <- ggplot(StopSearchOEth, aes(x=reorder(Officer.defined.ethnicity, -fre
   guides(fill = FALSE) +
   theme(axis.text.x = element_text(hjust = 0)) +
   theme(plot.title=element_text(size = rel(1.2), lineheight = 1, face = "bold"))
-)
 ggplotly(OEthplot) %>% layout(showlegend = FALSE)
 
 
 #Lets see how the self reported ethnicity and officer reported ethnicity match up
 EthComp <- table(StopSearch$Self.defined.ethnicity, StopSearch$Officer.defined.ethnicity)
 EthComp %>% kable() %>% kable_styling()
+EthComp <- as.data.frame(EthComp)
+colnames(EthComp) <- c("SelfReportedEthnicity", "OfficerReportedEthnicity", "Freq")
+
+#Creating a stacked box plot, in stages
+EthCompB <- ggplot(StopSearch, aes(Officer.defined.ethnicity))
+EthCompB + geom_bar()
+EthCompBplot <- EthCompB + geom_bar(aes(fill=Self.defined.ethnicity))
+
+ggplotly(EthCompBplot)
+
+library(forcats)
+StopSearch$Officer.defined.ethnicity <- fct_infreq(StopSearch$Officer.defined.ethnicity)
+EthCompBs <- ggplot(StopSearch, aes(Officer.defined.ethnicity))
+EthCompBs + geom_bar()
+EthCompBsplot <- EthCompBs + geom_bar(aes(fill=Self.defined.ethnicity))
+
+ggplotly(EthCompBsplot)
+
+
+
+
+EthCompP <- ggplot(StopSearch) +
+  aes(x=Officer.defined.ethnicity, fill=Self.defined.ethnicity) +
+  geom_bar(position="fill")
+ggplotly(EthCompP)
