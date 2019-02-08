@@ -29,10 +29,15 @@ Syntax highlighted code block
 
 For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
 
-### Jekyll Themes
+### Week 2: Clustering different countries top 50 Spotify playlists
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/DataS-DH/DataS-DH.github.io/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+For this weeks session we use data from Spotify's API, this data is provided for download here, but you can also explore how to use the API in the additional tutorial: [How to access the Spotify API](https://github.com/DataS-DH/DataS-DH.github.io/AccessingAPI.rmd). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
 
 ### Support or Contact
 
 Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+
+##### [Week 1: Exploring spotify features data](http://htmlpreview.github.com/?https://github.com/DataS-DH/R-coding-club/blob/master/Week1/Spotify_songs.html)
+
+##### [Week 2: Comparing spotify playlists](http://htmlpreview.github.io/?https://github.com/DataS-DH/R-coding-club/blob/master/Week2)
+##### [Week 2 extra: Accessing the Spotify API](http://htmlpreview.github.io/?https://github.com/DataS-DH/R-coding-club/blob/master/Week2/AccessingAPI.html)
