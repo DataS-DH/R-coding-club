@@ -1,0 +1,187 @@
+---
+author: "Katie Davidson [&lt;katie.davidson@dhsc.gov.uk&gt;](mailto:katie.davidson@dhsc.gov.uk)"
+date: "\\11th January 2019"
+output:
+  html_document
+---
+
+```{r "setup", include=FALSE}
+knitr::opts_knit$set(root.dir = "//ims.gov.uk/data/Users/GBEXPVD/EXPHOME14/KDavidson/My Documents/Health_R_coding_club")
+
+```
+
+
+
+#Health R coding club
+###Is speechiness more important than danceability?
+####What made a hit record in 2017 according to spotify?
+
+---
+*Hint: First things first, make sure you are working in a script rather than the console, to open a new script you can use the keyboard shortcut "Ctrl+ Shift + ".*
+
+####Setting up our workspace
+
+First we must set up R so that we are looking at the folder where we saved our data using the set working directory function: setwd("...")
+
+*Hint: Remember to flip your slashs, they should be /. This makes them r readable.*
+
+We must also we have all the packages we require installed.
+
+```{r, eval=FALSE}
+install.packages("radarchart")
+install.packages("ggplot2")
+install.packages("kableExtra")
+install.packages("tidyr")
+install.packages("plotly")
+install.packages("dplyr")
+installed.packages("corrplot")
+```
+```{r echo=TRUE, include=FALSE}
+library(radarchart)
+library(ggplot2)
+library(kableExtra)
+library(tidyr)
+library(plotly)
+library(dplyr)
+library(corrplot)
+```
+
+
+####Reading in the data
+
+```{r}
+ songs <- read.csv("spotify2017featuresdf.csv", header=T, sep=",")
+```
+
+####Check your data
+
+Let's take a quick look at the data make sure it is as we expect.\  
+There are a couple of key functions we can make use of to do this, these are summary and strusture.
+```{r}
+str(songs)
+```
+This function tells us about the structure of our data, here we can see the different variables within our data and the the variable type for example our data has numeric and factor variables.
+
+
+```{r}
+summary(songs)
+```
+Here we can see the ranges of numerical values.\   
+
+We can also take a look at our full data set:
+```{r}
+library(kableExtra)
+kable(songs) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"), font_size = 12) %>%
+scroll_box(width = "720px", height = "500px")
+```
+
+To enable us to know how popular a song is i.e. where t placed in the top 100, we must add a variable to indicate a songs position.
+
+```{r}
+songs$rank <- seq.int(nrow(songs))
+```
+####Feature exploration
+
+#####Firstly lets look at speechiness
+
+The [Spotify Web API Guidance](https://developer.spotify.com/documentation/web-api/reference/tracks/get-audio-features/) gives the below information on Speechiness: \  
+
+**Speechiness**: Speechiness detects the presence of spoken words in a track. The more exclusively speech-like the recording (e.g. talk show, audio book, poetry), the closer to 1.0 the attribute value. Values above 0.66 describe tracks that are probably made entirely of spoken words. Values between 0.33 and 0.66 describe tracks that may contain both music and speech, either in sections or layered, including such cases as rap music. Values below 0.33 most likely represent music and other non-speech-like tracks.
+
+```{r}
+teal <- "#17bebb"
+speech <- ggplot(songs, aes(x=reorder(name, -speechiness), y=speechiness, text=(paste( "Track:", name, "<br>", "Artist:", artists, "<br>", "Speechiness:", speechiness))))+
+  geom_col(fill=teal)+
+  theme_minimal()+
+  theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.ticks.y=element_blank())+
+  ggtitle("Speechiness")
+ggplotly(speech, tooltip=c("text"))
+```
+
+We can now take this code and apply it to other features, for example lets look at danceability. \  
+
+**Danceability**: Describes how suitable a track is for dancing based on a combination of musical elements including tempo, rhythm stability, beat strength, and overall regularity. A value of 0.0 is least danceable and 1.0 is most danceable.
+
+```{r}
+pink <- "#ff6f59"
+dance <- ggplot(songs, aes(x=reorder(name, -danceability), y=danceability, text=(paste( "Track:", name, "<br>", "Artist:", artists, "<br>", "Danceability:", danceability))))+
+  geom_col(fill=pink)+
+  theme_minimal()+
+  theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.ticks.y=element_blank())+
+  ggtitle("Danceability")
+ggplotly(dance, tooltip=c("text"))
+```
+
+Finally lets take a look at key.\  
+
+**Key**: The key the track is in. Integers map to pitches using standard Pitch Class notation. E.g. 0 = C, 1 = C???/D???, 2 = D, and so on.\  
+
+If you recall when we looked at the structure of the data this variable is slightly different as it is a factor. To help us explore it graphically we need to create a different view of the data.
+
+```{r}
+songs_key <- songs%>%
+  select(name, key)%>%
+  mutate(n=n())%>%
+  unique()%>%
+  group_by(key)%>%
+  mutate(total=sum(n))%>%
+  mutate(percent=round((n/total)*100))
+
+head(songs_key, 10)
+```
+
+Lets firstly look at what percentage of all the top 100 songs are in each key.
+
+```{r}
+key <- ggplot(songs_key, aes(x=key))
+```
+
+#####Relationship between features
+
+To do this we will first just take the top 5 songs.
+
+to make the chart more readable and clear, first we need to normalise the values from 0 to 1.
+
+```{r}
+songs_5 <- songs[1:5,-c(1,3,17)]
+songs_5_n <- cbind(songs_5[1], apply(songs_5[-1],2,function(x){(x-min(x))/diff(range(x))}))
+radarDF <- gather(songs_5_n, key=Attribute, value=Score, -name) %>%
+  spread(key=name, value=Score)
+
+chartJSRadar(scores = radarDF,
+             scaleStartValue = -1,
+             maxScale=1,
+             showToolTipLabel=TRUE)
+```
+
+
+```{r}
+songs_5 <- songs[1:5,-c(1,3,17,16)]
+songs_5_n <- cbind(songs_5[1], apply(songs_5[-1],2,function(x){(x-min(x))/diff(range(x))}))
+radarDF <- gather(songs_5_n, key=Attribute, value=Score, -name) %>%
+  spread(key=name, value=Score)
+
+chartJSRadar(scores = radarDF,
+             scaleStartValue = -1,
+             maxScale=1,
+             showToolTipLabel=TRUE)
+```
+
+
+###Explore relationship between features and ranking.
+
+```{r}
+songs_c <- songs[,-c(1:3,16,8,15)]
+pairs(songs_c)
+cor(songs_c)
+```
+
+
+###Next time: Clustering
