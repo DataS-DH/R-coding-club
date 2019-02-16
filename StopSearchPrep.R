@@ -45,7 +45,6 @@ Ethplot <- ggplot(StopSearchEth, aes(x=reorder(Self.defined.ethnicity, -freq), y
   guides(fill = FALSE) +
   theme(axis.text.x = element_text(hjust = 0)) +
   theme(plot.title=element_text(size = rel(1.2), lineheight = 1, face = "bold"))
-  
 
 ggplotly(Ethplot) %>% layout(showlegend = FALSE)
 
