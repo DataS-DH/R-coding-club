@@ -1,6 +1,7 @@
 #Stop and search data
 library(tidyverse)
 library(kableExtra)
+library(plotly)
 
 setwd("~/Health_R_coding_club/R-coding-club/")
 unzip("19bda6b8c03fcde120a171c3d114cd92575e3a50.zip", exdir= "~/Health_R_coding_club/R-coding-club")
@@ -88,3 +89,8 @@ EthCompP <- ggplot(StopSearch) +
   aes(x=Officer.defined.ethnicity, fill=Self.defined.ethnicity) +
   geom_bar(position="fill")
 ggplotly(EthCompP)
+
+setwd("~/Health_R_coding_club/R-coding-club/")
+write_csv(StopSearch, "StopSearchDec.csv")
+write_csv(StopSearchEth, "SSEth.csv")
+write_csv(StopSearchOEth, "SSOEth.csv")
