@@ -1,4 +1,7 @@
 #Creating smaller groups of ethnicity
+library(tidyverse)
+library(plotly)
+
 
 #Look at how it ientifies variable types differently between the two functions.
 StopSearch <- read_csv("StopSearchDec.csv")
@@ -78,5 +81,51 @@ AGEplot <- ggplot(SS_AGE, aes(x=reorder(DEMO, -freq), y=freq, fill=Ethnicity)) +
 
 ggplotly(AGEplot) %>% layout(legend=list(orientation="h"))
 
-#plot of groups, so ethnicity, then different bars for age within and then stacked on gender.
+#playing around to find the best way to present the data to show potentia bias
+
+#a super simple thing we can do is this
+with(StopSearch, barplot(ftable(Age.range, Ethnicity, Gender), beside = TRUE))
+
+#a tidyverse attempt
+
+#summarise the dataframe - create means of scores by Type
+StopSearch1 <- StopSearch %>% group_by(Gender, Ethnicity, Age.range) %>% summarise(count=n())
+
+#create plot
+ggplot(StopSearch1, aes(x = Gender, y = count, fill = Ethnicity)) +
+  geom_bar(stat = "identity") +
+  facet_wrap(~Age.range, nrow = 1)
+
+#Make the x axis legable
+demo_plot <- ggplot(StopSearch1, aes(x = reorder(Ethnicity, -count), y = count, fill = Age.range)) +
+  geom_bar(stat = "identity") +
+  xlab("") +
+  facet_wrap(~Age.range, nrow = 1) +
+  theme(axis.text.x = element_text(angle = 50, hjust = 1))
+
+ggplotly(demo_plot) %>% layout(legend=list(orientation = "h", y = 0.93, x = 0.34))
+
 #bring in wider ethnicity data, to calcualte proportion of population being SS.
+pop_eth <- read.csv("population-of-england-and-wales-by-ethnicity.csv")
+levels(pop_eth$Ethnicity)
+pop_ethnicity <- subset(pop_eth, Ethnicity=="Asian" | Ethnicity =="Black" | Ethnicity =="Mixed" | Ethnicity =="White" | Ethnicity =="Other")
+
+#format stop search data to have same view.
+SS_ethnicity <- aggregate(StopSearch, by=list(StopSearch$Ethnicity), FUN=count)
+colnames(SS_ethnicity) <- c("Ethnicity", "Freq")
+SS_ethProp <- StopSearch %>% 
+  group_by(Ethnicity) %>% 
+  summarise_all(funs( percent = 100 * n() / nrow(StopSearch), count))
+SS_ethnicity <- merge(SS_ethProp, SS_ethnicity)
+
+SS_ethnicity <- merge(SS_ethnicity, pop_ethnicity)
+colnames(SS_ethnicity) <- c("Ethnicity", "SS_prop", "Freq", "population", "population_prop" )
+
+SSeth_prop <- gather(SS_ethnicity, variable, value, c(SS_prop, population_prop), factor_key=TRUE)
+SSeth_prop <- SSeth_prop[,-c(2:3)]
+
+ggplot(SSeth_prop) + geom_bar(aes(x=var), y=value)
+
+#I would ideally like to look at this through a geogrpahic lense, but there is only an annoynimised long/lat data points.
+#How do we translate this into a geographical boundary like LSOA, LA.
+
