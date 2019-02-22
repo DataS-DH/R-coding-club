@@ -1,7 +1,17 @@
 #Creating smaller groups of ethnicity
+if (!require(tidyverse)) {
+  install.packages("tidyverse")
+  library(tidyverse)
+}
+
+if (!require(plotly)) {
+  install.packages("plotly")
+  library(plotly)
+}
 library(tidyverse)
 library(plotly)
 
+setwd("~/Health_R_coding_club")
 
 #Look at how it ientifies variable types differently between the two functions.
 StopSearch <- read_csv("StopSearchDec.csv")
@@ -33,14 +43,14 @@ table(StopSearch$Ethnicity, StopSearch$Officer.defined.ethnicity)
 #Let's visualise it again using code from last week.
 EthCompB <- ggplot(StopSearch, aes(Officer.defined.ethnicity))
 EthCompB + geom_bar()
-EthCompBplot <- EthCompB + geom_bar(aes(fill=Ethnicity))
+EthCompBplot <- EthCompB + geom_bar(aes(fill= Ethnicity))
 
 ggplotly(EthCompBplot)
 
 #as proportions
 EthCompP <- ggplot(StopSearch) +
-  aes(x=Officer.defined.ethnicity, fill=Ethnicity) +
-  geom_bar(position="fill")
+  aes(x= Officer.defined.ethnicity, fill= Ethnicity) +
+  geom_bar(position= "fill")
 ggplotly(EthCompP)
 
 
@@ -49,21 +59,21 @@ prop.table(table(StopSearch$Ethnicity))
 
 #gender, ethnicity breakdown
 EthCompP <- ggplot(StopSearch) +
-  aes(x=Ethnicity, fill=Gender) +
+  aes(x= Ethnicity, fill= Gender) +
   geom_bar()
 ggplotly(EthCompP)
 
-EthCompP <- EthCompP + geom_bar(position="fill")
+EthCompP <- EthCompP + geom_bar(position= "fill")
 ggplotly(EthCompP)
 
 
 #age, ethnicity breakdown
 EthCompP <- ggplot(StopSearch) +
-  aes(x=Ethnicity, fill=Age.range) +
+  aes(x = Ethnicity, fill=Age.range) +
   geom_bar()
 ggplotly(EthCompP)
 
-EthCompP <- EthCompP +  geom_bar(position="fill")
+EthCompP <- EthCompP +  geom_bar(position = "fill")
 ggplotly(EthCompP)
 
 #Lets look at the number of different groups stopped, using age, gender, Ethnicity
@@ -71,16 +81,16 @@ ggplotly(EthCompP)
 SS_AGE <- plyr::count(StopSearch, c("Ethnicity", "Age.range", "Gender"))
 SS_AGE$DEMO <- paste0(SS_AGE$Ethnicity, SS_AGE$Age.range, SS_AGE$Gender)
 
-AGEplot <- ggplot(SS_AGE, aes(x=reorder(DEMO, -freq), y=freq, fill=Ethnicity)) + geom_bar(stat="identity") +
+AGEplot <- ggplot(SS_AGE, aes(x = reorder(DEMO, -freq), y=freq, fill=Ethnicity)) + geom_bar(stat="identity") +
   xlab("Population group") +
   ggtitle("Demographic profile of individuals stopped by police for stop & search") + coord_flip() +
   scale_x_discrete(labels = function(x) str_wrap(x, width = 30)) +
   guides(fill = FALSE) +
   theme(axis.text.x = element_text(hjust = 0)) +
-  theme(plot.title=element_text(size = rel(1.2), lineheight = 1, face = "bold"))
+  theme(plot.title = element_text(size = rel(1.2), lineheight = 1, face = "bold"))
 
-ggplotly(AGEplot) %>% layout(legend=list(orientation="h"))
-
+ggplotly(AGEplot) %>% layout(legend = list(orientation="h"))
+ 
 #playing around to find the best way to present the data to show potentia bias
 
 #a super simple thing we can do is this
@@ -89,7 +99,7 @@ with(StopSearch, barplot(ftable(Age.range, Ethnicity, Gender), beside = TRUE))
 #a tidyverse attempt
 
 #summarise the dataframe - create means of scores by Type
-StopSearch1 <- StopSearch %>% group_by(Gender, Ethnicity, Age.range) %>% summarise(count=n())
+StopSearch1 <- StopSearch %>% group_by(Gender, Ethnicity, Age.range) %>% summarise(count = n())
 
 #create plot
 ggplot(StopSearch1, aes(x = Gender, y = count, fill = Ethnicity)) +
@@ -103,29 +113,39 @@ demo_plot <- ggplot(StopSearch1, aes(x = reorder(Ethnicity, -count), y = count, 
   facet_wrap(~Age.range, nrow = 1) +
   theme(axis.text.x = element_text(angle = 50, hjust = 1))
 
-ggplotly(demo_plot) %>% layout(legend=list(orientation = "h", y = 0.93, x = 0.34))
+ggplotly(demo_plot) %>% layout(legend = list(orientation = "h", y = 0.93, x = 0.34))
 
 #bring in wider ethnicity data, to calcualte proportion of population being SS.
+#Note population data covers England and Wales whereas te stop & search data only covers England. 
 pop_eth <- read.csv("population-of-england-and-wales-by-ethnicity.csv")
 levels(pop_eth$Ethnicity)
-pop_ethnicity <- subset(pop_eth, Ethnicity=="Asian" | Ethnicity =="Black" | Ethnicity =="Mixed" | Ethnicity =="White" | Ethnicity =="Other")
+pop_ethnicity <- subset(pop_eth, Ethnicity == "Asian" | Ethnicity == "Black" | Ethnicity == "Mixed" | Ethnicity == "White" | Ethnicity == "Other")
 
 #format stop search data to have same view.
-SS_ethnicity <- aggregate(StopSearch, by=list(StopSearch$Ethnicity), FUN=count)
-colnames(SS_ethnicity) <- c("Ethnicity", "Freq")
-SS_ethProp <- StopSearch %>% 
-  group_by(Ethnicity) %>% 
-  summarise_all(funs( percent = 100 * n() / nrow(StopSearch), count))
+SS_ethnicity <- StopSearch %>% group_by(Ethnicity) %>% summarise(Freq = n())
+
+#create proportion variable
+SS_ethProp <- StopSearch %>% group_by(Ethnicity) %>% 
+  summarise( percent = 100 * n() / nrow(StopSearch))
 SS_ethnicity <- merge(SS_ethProp, SS_ethnicity)
 
 SS_ethnicity <- merge(SS_ethnicity, pop_ethnicity)
-colnames(SS_ethnicity) <- c("Ethnicity", "SS_prop", "Freq", "population", "population_prop" )
+colnames(SS_ethnicity) <- c("Ethnicity", "SS_prop", "Freq", "pop_Freq", "pop_prop" )
 
-SSeth_prop <- gather(SS_ethnicity, variable, value, c(SS_prop, population_prop), factor_key=TRUE)
+#we need to fix the format of the pop_Freq variable
+
+SS_ethnicity$prop_Stop <- SS_ethnicity$Freq/SS_ethnicity$pop_Freq
+
+#plot the data
+ggplot(SS_ethnicity) + geom_bar(aes(x=Ethnicity, y=prop_Stop))
+
+SSeth_prop <- gather(SS_ethnicity, variable, value, c(SS_prop, pop_prop), factor_key = TRUE)
 SSeth_prop <- SSeth_prop[,-c(2:3)]
 
-ggplot(SSeth_prop) + geom_bar(aes(x=var), y=value)
 
-#I would ideally like to look at this through a geogrpahic lense, but there is only an annoynimised long/lat data points.
+
+
+
+#I would ideally like to look at this through a geographic lense, but there is only an annoynimised long/lat data points.
 #How do we translate this into a geographical boundary like LSOA, LA.
 
