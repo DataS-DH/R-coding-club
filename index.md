@@ -5,14 +5,14 @@ Our next session is on 8th February.
 
 You can sign up on eventbrite to find all the dates and get reminders before each  event.
 
-### Markdown
+### Weekly examples will be shared as raw code files or Markdown documents
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+Each week a dataset and topic/question will be provided and a walk through exploration given. You can follow along or explore the data on your own to try to find alternative findings or presentations. 
 
 ```markdown
 Syntax highlighted code block
 
-# Header 1
+# Header 1                                                                                                                     
 ## Header 2
 ### Header 3
 
@@ -31,11 +31,7 @@ For more details see [GitHub Flavored Markdown](https://guides.github.com/featur
 
 ### Week 2: Clustering different countries top 50 Spotify playlists
 
-For this weeks session we use data from Spotify's API, this data is provided for download here, but you can also explore how to use the API in the additional tutorial: [How to access the Spotify API](https://github.com/DataS-DH/DataS-DH.github.io/AccessingAPI.rmd). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+For this weeks session we use data from Spotify's API, this data is provided for download here, but you can also explore how to use the API in the additional tutorial: [How to access the Spotify API](https://github.com/DataS-DH.github.io/AccessingAPI.rmd). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
 
 ##### [Week 1: Exploring spotify features data](http://htmlpreview.github.com/?https://github.com/DataS-DH/R-coding-club/blob/master/Week1/Spotify_songs.html)
 
