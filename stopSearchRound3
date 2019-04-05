@@ -21,7 +21,7 @@ StopSearch <- read.csv("stop-and-search.csv")
 
 policeForce_map_shp <- readOGR("Police_Force_Areas_December_2016_Ultra_Generalised_Clipped_Boundaries_in_England_and_Wales.shp", layer = "Police_Force_Areas_December_2016_Ultra_Generalised_Clipped_Boundaries_in_England_and_Wales", GDAL1_integer64_policy = TRUE)
 
-policeForce_map_shp <- spTransform(counties_map_shp, CRS("+proj=longlat +ellps=GRS80"))
+policeForce_map_shp <- spTransform(policeForce_map_shp, CRS("+proj=longlat +ellps=GRS80"))
 
 #Lets focus on a ethnicity
 StopSearchBlack <- subset(StopSearch, Ethnicity == "Black" & Time=="2017/18", select = c(Geography, Rate.per.1.000.population.by.ethnicity))
