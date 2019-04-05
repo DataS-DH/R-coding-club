@@ -26,7 +26,7 @@ policeForce_map_shp <- spTransform(policeForce_map_shp, CRS("+proj=longlat +ellp
 #Lets focus on a ethnicity
 StopSearchBlack <- subset(StopSearch, Ethnicity == "Black" & Time=="2017/18", select = c(Geography, Rate.per.1.000.population.by.ethnicity))
 
-levels_map <- merge(policeForce_map_shp, StopSearchBlack, by.x = "ctyua17nm", by.y="Geography")
+levels_map <- merge(policeForce_map_shp, StopSearchBlack, by.x = "pfa16nm", by.y="Geography")
 
 #bins <- c(1,2,3,4)
 colours <- c("#FA2424", "#1BA9F0", "#FFD700", "#59AF56")
