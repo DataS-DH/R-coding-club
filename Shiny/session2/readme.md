@@ -8,14 +8,13 @@ We are referencing lots of free online material - as always!
 
 You can run the example apps in shiny using the below code:
 
-```markdown
 
-`library(shiny)`
+`library(shiny)
 #this will show you all the example apps you can run
-`runExample()`
+runExample()
 
 #to run an example simply put the app name in "" within the runExample() e.g.
-`runExample("01_hello")`
-`<addr>`
-```
+runExample("01_hello")
+<addr>`
+
 `<addr>`
