@@ -11,10 +11,10 @@ You can run the example apps in shiny using the below code:
 
 `library(shiny)`
 #this will show you all the example apps you can run
+
 `runExample()`
 
 #to run an example simply put the app name in "" within the runExample() e.g.
+
 `runExample("01_hello")`
 
-
-`<addr>`
