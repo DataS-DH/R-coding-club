@@ -11,7 +11,7 @@ You can run the example apps in shiny using the below code:
 
 `library(shiny)`
 
-`runExample() ```markdown #this will show you all the example apps you can run` ```
+`runExample()` ```markdown #this will show you all the example apps you can run ```
 
 
 `runExample("01_hello")` #to run an example simply put the app name in "" within the runExample() e.g.
