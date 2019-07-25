@@ -16,5 +16,6 @@ You can run the example apps in shiny using the below code:
 
 #to run an example simply put the app name in "" within the runExample() e.g.
 `runExample("01_hello")`
-
+`<addr>`
 ```
+`<addr>`
