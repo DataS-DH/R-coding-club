@@ -1,9 +1,9 @@
 This week we will be looking into reactivity within shiny applications. 
 
 We are referencing lots of free online material - as always!
-R shiny interactivity overview[https://shiny.rstudio.com/articles/reactivity-overview.html]
+[R shiny interactivity overview](https://shiny.rstudio.com/articles/reactivity-overview.html)
 
-The example R shiny apps[https://shiny.rstudio.com/articles/basics.html]
+[The example R shiny apps](https://shiny.rstudio.com/articles/basics.html)
 
 
 You can run the example apps in shiny using the below code:
