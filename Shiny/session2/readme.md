@@ -5,6 +5,8 @@ We are referencing lots of free online material - as always!
 
 [The example R shiny apps](https://shiny.rstudio.com/articles/basics.html)
 
+All the code for the [example apps are also on github](https://github.com/rstudio/shiny-examples) and can be ran locally.
+
 
 You can run the example apps in shiny using the below code:
 
