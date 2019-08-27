@@ -47,9 +47,9 @@ shapiro.test(heights$height)
 
 
 diamonds_2 <- diamonds %>%
-  mutate(price_group = cut(price, breaks=c(0,500,1000, 2000, 3000,4000,5000, 7000, 10000, 20000), labels=c("0-500","501-1000", "1001-2000","2001-3000","3001-4000","4001-5000","5001-6000", "6001-10000","10001-20000" )))
+  mutate(price_group = cut(price, breaks = c(0,500,1000, 2000, 3000,4000,5000, 7000, 10000, 20000), labels = c("0-500","501-1000", "1001-2000","2001-3000","3001-4000","4001-5000","5001-7000", "7001-10000","10001-20000" )))
 
-ggplot(diamonds_2, aes(x=price_group))+
+ggplot(diamonds_2, aes(x = price_group)) +
   geom_bar()
 
 #Quick check for missing data using Amelia package
@@ -106,10 +106,10 @@ cor.test(x=diamonds$price,y=diamonds$x, use="all.obs")
 
 library(Hmisc)
 
-rcorr(diamonds$price, diamonds$x,type="spearman")
+rcorr(diamonds$price, diamonds$x,type = "spearman")
 
 
-#tidy intoa table
+#tidy in to a table
 
 table <- rcorr(diamonds$price, diamonds$x,type="spearman")
 
@@ -133,20 +133,22 @@ cut <- as.matrix(diamonds[c(1,5:10)])
 #create correlation matrix
 corr_matrix <- cor(cut)
 
-corrplot(corr_matrix, method="number") # this will display the correlation coefficient
+corrplot(corr_matrix) # default method is circle
 
-corrplot(corr_matrix, method="color") # there are lots of different visual options to change style
+corrplot(corr_matrix, method = "number") # this will display the correlation coefficient
+
+corrplot(corr_matrix, method = "color") # there are lots of different visual options to change style
 
 
 #combine with signifigance test
 
-res1<- cor.mtest(cut , conf.level = .95)# creates p values
+res1 <- cor.mtest(cut , conf.level = .95)# creates p values
 
-corrplot(corr_matrix, p.mat = res1$p, sig.level= .05)# combine with coefficients -
+corrplot(corr_matrix, p.mat = res1$p, sig.level = .05)# combine with coefficients -
 #p values must be included with p.mat expression
 
 #you can set your signifigance level using sig.level nad show which are signifigant=
-corrplot(corr_matrix, method="color", p.mat = res1$p, insig = "label_sig",
+corrplot(corr_matrix, method = "color", p.mat = res1$p, insig = "label_sig",
          sig.level = c(.001, .01, .05), pch.cex = 1.2, pch.col = "black")
 
 
@@ -154,9 +156,9 @@ corrplot(corr_matrix, method="color", p.mat = res1$p, insig = "label_sig",
 
 #can be performed in base r using the lm function with y as dependent variable
 
-fit <- lm(y ~ x1 + x2 + x3, data=mydata)#example
+# fit <- lm(y ~ x1 + x2 + x3, data = mydata) #example formula
 
-mrdiamonds <- lm( price ~  carat + z,data=diamonds)
+mrdiamonds <- lm( price ~  carat + z,data = diamonds)
 summary(mrdiamonds)
 
 mrdiamondstable <- tidy(mrdiamonds)
@@ -165,7 +167,7 @@ mrdiamondstable <- tidy(mrdiamonds)
 #other useful functions
 
 coefficients(mrdiamonds) # model coefficients
-confint(mrdiamonds, level=0.95) # CIs for model parameters 
+confint(mrdiamonds, level = 0.95) # CIs for model parameters 
 fitted(mrdiamonds) # predicted values
 anova(mrdiamonds) # anova table 
 vcov(mrdiamonds) # covariance matrix for model parameters 
@@ -181,7 +183,7 @@ plot(mrdiamonds)
 
 #will use a smaller dataset to illustrate this
 d <- iris %>% 
-  select(-Species)
+  dplyr::select(-Species)
 
 # Fit the model - using the '.' runs MR with all remaining varianbles
 fit <- lm(Sepal.Width ~ ., data = iris)
@@ -203,8 +205,6 @@ d %>%
   theme_bw()+
   #you can also add connecting lines between actual and predicted
   geom_segment(aes(xend = x, yend = predicted), alpha = .2) 
-
-
 
 
 #TESTS OF DIFFERENCE
@@ -230,7 +230,7 @@ chisq.test(Dtable) #p= <0.0001
 #t-test - 
 #paired (two related variables) e.g. before and after treatment
 
-t.test(x~y, paired=TRUE)
+t.test(x~y, paired = TRUE)
 
 #need to order dataset to make sure results are paired
 
