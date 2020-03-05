@@ -1,0 +1,124 @@
+---
+title: 'Importing data'
+author: "Martine Wauben"
+institute: "DHSC"
+date: "2020-03-05 (updated: `r Sys.Date()`)"
+css: my-theme.css
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include = FALSE}
+library(knitr)
+library(readr)
+library(downloader)
+library(readxl)
+```
+
+
+class: inverse
+
+# Session overview
+
+* What is data?
+* Importing .csv
+* Importing .xls
+* Importing .xlsx
+* Handling common data problems
+* Cleaning excel data
+
+---
+
+# What is data?
+
+.pull-right[![](https://media0.giphy.com/media/BoC8nVlu3oNRsBJw30/giphy.gif)]
+
+.pull-left[
+> things known or assumed as facts, making the basis of reasoning or calculation.
+
+--
+
+But in our life:
+
+> the quantities, characters, or symbols on which operations are performed by a computer, which may be stored and transmitted in the form of electrical signals and recorded on magnetic, optical, or mechanical recording media.
+
+--
+
+However, this still **does not mean it has to be tabular**!
+]
+
+---
+
+# What is data at DHSC?
+
+* NHS Digital
+* NHS England
+* Public Health England
+* ONS
+* AB-specific databases / portals
+* etc.
+
+--
+
+Usually looking roughly like this...
+
+.center[<img src='https://i.imgur.com/pT3S8ij.png' height = '300px' width = '700px'>]
+
+---
+
+# Importing CSV
+
+Machine-readable! Should not have major data cleaning problems.
+
+```{r read csv}
+csv_data <- readr::read_csv('https://files.digital.nhs.uk/3B/57FD0B/ESR_ABSENCE_annual_csv_HEE.csv')
+```
+
+---
+
+# Importing CSV
+
+Automatically reads headers and variable types (based on the first 1000 rows):
+
+```{r show csv, echo = FALSE}
+knitr::kable(csv_data, format = 'html')
+```
+
+---
+
+# Importing .xls
+
+Can have formatting and data type issues, but relatively simple files. Proprietary software, but R package has your back. 
+
+```{r read excel}
+downloader::download('https://files.digital.nhs.uk/07/9F94A7/hosp-epis-stat-hesnational-2017-18.xls', destfile='xls_data.xls', mode='wb')
+xls_data <- readxl::read_excel('xls_data.xls',
+                               sheet = 3)
+```
+
+---
+
+# Importing .xls
+
+Fixing the data issues.
+
+* **Explanatory/empty rows at the beginning**
+```{r fix excel, echo = FALSE}
+xls_data <- readxl::read_excel('xls_data.xls',
+                               sheet = 3,
+                               skip = 6)
+```
+
+* **Multiple header rows**
+```{r fix excel colnames, echo = FALSE}
+cols <- xls_data[1,]
+colnames(xls_data) <- ifelse(is.na(colnames(xls_data)), cols, colnames(xls_data))
+xls_data <- xls_data[2:nrow(xls_data),]
+head(xls_data)
+```
+
