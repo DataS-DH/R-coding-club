@@ -15,7 +15,7 @@ class: center, middle, inverse, title-slide
 # Becoming a regexpert
 ### Martine Wauben
 ### DHSC
-### 2020-03-04 (updated: 2020-03-04)
+### 2020-03-04 (updated: 2020-03-05)
 
 ---
 
@@ -256,10 +256,6 @@ https://rstudio.com/wp-content/uploads/2016/09/RegExCheatsheet.pdf
 
 ---
 
-background-image: url(https://stringr.tidyverse.org/logo.png)
-background-position: top
-background-position: right
-
 # Useful R functions
 
 Show you how a character vector and a regular expression match
@@ -280,7 +276,7 @@ stringr::str_detect(string, pattern) //// grep(pattern, string)
 Returns a logical vector (so you can count the number of matches using sum())
 
 ```r
-stringr::str_which(string, pattern) //// grepl(pattern, string)
+stringr::str_which(string, pattern)  //// grepl(pattern, string)
 ```
 Replace matches with another (defined) string
 
@@ -327,8 +323,8 @@ Write a regex that will match...
 
 * **Challenge 1**: Words that start with a consonant and end with a vowel
 * **Challenge 2**: Words in ALL CAPS
-* **Challenge 3**: A British mobile phone number
-* **Challenge 4**: A username that is at least 8 characters long, using only letters and numbers
+* **Challenge 3**: British mobile phone numbers
+* **Challenge 4**: Usernames at least 8 characters long, using only letters and numbers
 
 .center[![](https://img.buzzfeed.com/buzzfeed-static/static/2015-01/16/7/enhanced/webdr06/anigif_enhanced-661-1421411482-2.gif)]
     </textarea>
