@@ -15,9 +15,12 @@ output:
 
 ```{r setup, include = FALSE}
 library(knitr)
+library(magrittr)
 library(readr)
 library(downloader)
 library(readxl)
+library(kableExtra)
+library(ggplot2)
 ```
 
 
@@ -28,9 +31,10 @@ class: inverse
 * What is data?
 * Importing .csv
 * Importing .xls
+* Cleaning .xls
 * Importing .xlsx
+* Importing .zip
 * Handling common data problems
-* Cleaning excel data
 
 ---
 
@@ -39,15 +43,12 @@ class: inverse
 .pull-right[![](https://media0.giphy.com/media/BoC8nVlu3oNRsBJw30/giphy.gif)]
 
 .pull-left[
-> things known or assumed as facts, making the basis of reasoning or calculation.
 
---
+> things known or assumed as facts, making the basis of reasoning or calculation.
 
 But in our life:
 
 > the quantities, characters, or symbols on which operations are performed by a computer, which may be stored and transmitted in the form of electrical signals and recorded on magnetic, optical, or mechanical recording media.
-
---
 
 However, this still **does not mean it has to be tabular**!
 ]
@@ -71,23 +72,15 @@ Usually looking roughly like this...
 
 ---
 
-# Importing CSV
+# Importing .csv
 
-Machine-readable! Should not have major data cleaning problems.
+Machine-readable directly from the URL! Should not have major data cleaning problems.
 
 ```{r read csv}
 csv_data <- readr::read_csv('https://files.digital.nhs.uk/3B/57FD0B/ESR_ABSENCE_annual_csv_HEE.csv')
 ```
 
----
-
-# Importing CSV
-
-Automatically reads headers and variable types (based on the first 1000 rows):
-
-```{r show csv, echo = FALSE}
-knitr::kable(csv_data, format = 'html')
-```
+Automatically reads headers and variable types (based on the first 1000 rows).
 
 ---
 
@@ -96,29 +89,374 @@ knitr::kable(csv_data, format = 'html')
 Can have formatting and data type issues, but relatively simple files. Proprietary software, but R package has your back. 
 
 ```{r read excel}
-downloader::download('https://files.digital.nhs.uk/07/9F94A7/hosp-epis-stat-hesnational-2017-18.xls', destfile='xls_data.xls', mode='wb')
+downloader::download('https://files.digital.nhs.uk/07/9F94A7/hosp-epis-stat-hesnational-2017-18.xls', 
+                     destfile='xls_data.xls', mode='wb')
 xls_data <- readxl::read_excel('xls_data.xls',
                                sheet = 3)
 ```
 
 ---
 
-# Importing .xls
+# .xls problems
+
+.pull-right[![](https://i.imgur.com/nFlY8yb.png)]
+
+.pull-left[
+
+Not 'tidy' in the R sense of the word!
+
+![](https://media0.giphy.com/media/g79am6uuZJKSc/source.gif)
+]
+
+--
+
+.pull-left[
+To fix:
+
+* Explanatory/empty rows at the beginning
+* Multiple tables in one sheet
+* Multiple header rows
+* R-unfriendly column names
+
+]
+
+---
+
+# Cleaning .xls
 
 Fixing the data issues.
 
 * **Explanatory/empty rows at the beginning**
-```{r fix excel, echo = FALSE}
+
+```{r fix excel, message = FALSE}
 xls_data <- readxl::read_excel('xls_data.xls',
                                sheet = 3,
-                               skip = 6)
+                               skip = 6) #<<
 ```
 
+---
+
+# Cleaning .xls
+
+Fixing the data issues.
+
+* **Explanatory/empty rows at the beginning**
+* **Multiple tables in one sheet**
+
+```{r fix multiple tables, message = FALSE}
+xls_data <- readxl::read_excel('xls_data.xls',
+                               sheet = 3,
+                               skip = 6,
+                               n_max = 32) #<<
+```
+
+---
+
+# Cleaning .xls 
+
+Fixing the data issues.
+
+* **Explanatory/empty rows at the beginning**
+* **Multiple tables in one sheet**
 * **Multiple header rows**
-```{r fix excel colnames, echo = FALSE}
-cols <- xls_data[1,]
-colnames(xls_data) <- ifelse(is.na(colnames(xls_data)), cols, colnames(xls_data))
-xls_data <- xls_data[2:nrow(xls_data),]
-head(xls_data)
+
+```{r show excel 2, echo = FALSE}
+knitr::kable(head(xls_data, 2), format = 'html')
+
+colnames(xls_data)
 ```
 
+---
+
+# Cleaning .xls
+
+Fixing the data issues.
+
+* **Explanatory/empty rows at the beginning**
+* **Multiple tables in one sheet**
+* **Multiple header rows**
+
+```{r fix excel colnames}
+cols <- xls_data[1,]
+colnames(xls_data) <- ifelse(grepl('\\.', colnames(xls_data)), #<<
+                             cols,
+                             colnames(xls_data))
+xls_data <- xls_data[2:nrow(xls_data),]
+```
+
+```{r deduped colnames, echo = FALSE}
+colnames(xls_data)
+```
+
+---
+
+# Cleaning .xls
+
+Fixing the data issues.
+
+* **Explanatory/empty rows at the beginning**
+* **Multiple tables in one sheet**
+* **Multiple header rows**
+* **R-unfriendly column names**
+
+```{r clean colnames}
+xls_data <- janitor::clean_names(xls_data)
+```
+
+```{r show clean colnames, echo = FALSE}
+colnames(xls_data)
+```
+---
+
+# Cleaning .xls
+
+Finished result!
+
+```{r finished excel, echo = FALSE}
+knitr::kable(xls_data, format = 'html')%>%
+  kable_styling(full_width = F, 
+                font_size = 7)
+```
+
+---
+
+# Importing .xlsx
+
+You already know!
+
+```{r read xlsx, eval = FALSE}
+xlsx_data <- readxl::read_excel('xlsx_data.xlsx', sheet = 1)
+```
+
+.pull-right[![](https://media1.giphy.com/media/NEQrYh7YTy4MM/source.gif)]
+
+---
+
+# Importing .zip
+
+Mainly for really big data files, or multiple files that belong together.
+
+```{r download zip}
+downloader::download('https://files.digital.nhs.uk/9A/6C3480/Seven-day%20Services%20data%20files%2C%20Oct17-Sep18.zip',
+                     dest = 'seven_day_service.zip', mode = 'wb')
+unzip('seven_day_service.zip') #<<
+```
+
+![](https://i.imgur.com/dOrdnZi.png)
+
+---
+
+# Handling common data problems
+
+* **Not the right number of columns?**
+
+Some countries use different standard delimiters (for example, tab-delimited data). Rather than read_csv, you can specify the delimiter using this function:
+
+```{r custom delimiter, eval = FALSE}
+data <- read.table('data.txt', sep = "\t")
+```
+
+--
+
+* **Weird decimals?**
+
+Some countries use commas instead of dots to indicate decimal points. 
+
+```{r custom decimal, eval = FALSE}
+data <- read.table('data.txt', dec = ",")
+```
+
+--
+
+* **Missing values messing with your datatypes?**
+
+Statistical disclosure rules often result in '-' or similar strings inside numeric columns. Make sure they stay numeric by specifying which strings can be turned into 'NA's.
+
+```{r custom NA, eval = FALSE}
+data <- read.table('data.txt', na.strings = c("-", "?", '0'))
+```
+
+---
+
+# Why bother?
+
+## REPRODUCIBILITY
+
+Next time, your colleague only has to change the URL and maybe a few parameters to arrive at exactly the same dataset you did. This allows for:
+
+* Sharing your work (the URL is the same for everyone)
+* QA'ing your methods as separate from the results
+* Re-running your analysis later
+* Remembering exactly what steps you took to get to your final dataset
+
+.center[![](https://phdcomics.com/comics/archive/phd031214s.gif)]
+
+---
+
+# Exercise!
+
+Have a go at programmatically importing data from any of the files inside the Seven-Day Services zip file. 
+
+.center[https://digital.nhs.uk/data-and-information/publications/clinical-indicators/seven-day-services/archive/mi-seven-day-services---england-october-2017---september-2018
+
+https://bit.ly/338FOCf
+
+![](https://media2.giphy.com/media/yR4xZagT71AAM/giphy.gif)]
+
+---
+
+# Example: Seven-day Services length of stay
+
+**Download ZIP file**
+```{r example zip}
+downloader::download('https://files.digital.nhs.uk/9A/6C3480/Seven-day%20Services%20data%20files%2C%20Oct17-Sep18.zip',
+                     dest = 'seven_day_service.zip', mode = 'wb')
+unzip('seven_day_service.zip')
+```
+
+**Import correct .xlsx file (sheet 2 = Data)**
+
+```{r example xlsx}
+sevenday_data <- readxl::read_excel('Seven-day Services length of stay indicator, Oct17-Sep18 (xlsx).xlsx', 
+                                    sheet = 2)
+```
+
+---
+
+# Example: Seven-day Services length of stay
+
+![](https://i.imgur.com/gSe1THd.png)
+
+
+**Skip explanatory rows**
+
+```{r example xlsx skip, message = FALSE, results = FALSE}
+sevenday_data <- readxl::read_excel('Seven-day Services length of stay indicator, Oct17-Sep18 (xlsx).xlsx', 
+                                    sheet = 2, skip = 15)
+```
+
+
+---
+
+# Example: Seven-day Services length of stay
+
+**Three lines of headers!**
+
+```{r example xlsx headers}
+headers <- data.frame(head1 = colnames(sevenday_data),
+              head2 = as.character(as.vector(sevenday_data[1,])),
+              head3 = as.character(as.vector(sevenday_data[2,])),
+              stringsAsFactors = FALSE) %>%
+  dplyr::mutate(head1 = ifelse(grepl('\\.', head1), NA, head1))
+```
+
+```{r xlsx headers show, echo = FALSE}
+knitr::kable(headers, format = 'html')
+```
+
+---
+
+# Example: Seven-day Services length of stay
+
+**Three lines of headers!**
+
+```{r calculate headers}
+headers <- headers %>%
+  tidyr::fill(head1:head2) %>% #<<
+  dplyr::group_by(head1) %>%
+  tidyr::fill(head3) %>%
+  dplyr::ungroup() %>%
+  dplyr::mutate(colname = paste0(head1, ' ', 
+                                 ifelse(is.na(head2), '', head2), ' ', 
+                                 ifelse(is.na(head3), '', head3)))
+```
+
+```{r xlsx calc headers show, echo = FALSE}
+headers$colname
+```
+
+---
+
+# Example: Seven-day Services length of stay
+
+**Re-import with correct headers**
+
+```{r xlsx right headers}
+sevenday_data <- readxl::read_excel('Seven-day Services length of stay indicator, Oct17-Sep18 (xlsx).xlsx', 
+                                    sheet = 2, 
+                                    skip = 18, #<<
+                                    col_names = headers$colname) #<<
+```
+
+--
+
+**Unhelpful missing values**
+
+```{r xlsx missing values}
+sevenday_data <- readxl::read_excel('Seven-day Services length of stay indicator, Oct17-Sep18 (xlsx).xlsx', 
+                                    sheet = 2, skip = 18,
+                                    col_names = headers$colname,
+                                    na = '*') #<<
+```
+
+---
+
+# Example: Seven-day Services length of stay
+
+**Make headers R-friendly**
+```{r xlsx friendly headers}
+sevenday_data <- janitor::clean_names(sevenday_data)
+```
+
+```{r tidy headers show, echo = FALSE}
+colnames(sevenday_data)[1:10]
+```
+
+---
+
+# Workable data!
+
+```{r final tidy, echo = FALSE}
+knitr::kable(sevenday_data[1:4,], format = 'html')%>%
+  kableExtra::kable_styling(full_width = F, 
+                            font_size = 7)
+```
+
+.pull-right[![](https://media2.giphy.com/media/lSbTmUmQwxUmiExV4h/giphy.gif)]
+
+---
+
+# Using the data
+
+.center[
+```{r show data use, echo = FALSE, warning = FALSE, error = FALSE, out.width = '650px', out.height = '400px', dev='svg'}
+summ_data <- sevenday_data %>%
+  dplyr::select(trust_name, contains('median')) %>%
+  tidyr::pivot_longer(cols = contains('median'),
+                      names_to = 'admission_day') %>%
+  dplyr::mutate(admission_day = gsub('_median_length_of_stay_days', '', admission_day),
+                value = as.numeric(value)) %>%
+  dplyr::mutate(admission_day = factor(admission_day, levels = c('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'))) %>%
+  dplyr::group_by(admission_day) %>%
+  dplyr::summarise(mean_days = mean(value, na.rm = T),
+                   med_days = median(value, na.rm = T),
+                   sd_days = sd(value, na.rm = T),
+                   num = dplyr::n()) %>%
+  dplyr::ungroup() %>%
+  dplyr::mutate(upper_bound = mean_days + 1.96 * (sd_days / sqrt(num)),
+                lower_bound = mean_days - 1.96 * (sd_days / sqrt(num)))
+
+ggplot(summ_data, aes(x = admission_day))+
+  geom_bar(aes(y = mean_days), stat = 'identity', fill ="#00ad93") +
+  geom_errorbar(aes(ymin=lower_bound, ymax=upper_bound), width=.2,
+                 position=position_dodge(.9))+
+  labs(title = 'Length of stay following an emergency admission to hospital',
+       subtitle = 'Based on median length of stay per trust. Error bars represent 1.96 * SE',
+       x = 'Day of admission',
+       y = 'Mean length of stay (days)',
+       caption = 'Source: NHS Digital Seven-day Services - England, October 2017 - September 2018')+
+  theme_minimal() +
+  theme(panel.grid.major.x = element_blank())+ 
+  coord_fixed()
+```
+]
