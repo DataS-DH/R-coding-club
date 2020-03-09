@@ -3,7 +3,6 @@ title: 'Data wrangling with dplyr'
 author: "Martine Wauben"
 institute: "DHSC"
 date: "2020-03-09 (updated: `r Sys.Date()`)"
-css: my-theme.css
 output:
   xaringan::moon_reader:
     lib_dir: libs
@@ -28,6 +27,7 @@ class: inverse
 # Session overview
 
 * What is the tidyverse?
+* What is the %>%?
 * The dplyr package
 * The main functions
     * select()
@@ -36,18 +36,19 @@ class: inverse
     * mutate()
     * summarise()
     * group_by()
+* Recap & exercises
 
 ---
 
 # What is the tidyverse?
 
-![](https://i.imgur.com/q2ZAlOk.png)
+![](https://i.imgur.com/cdzUNDL.png)
 
 ---
 
 # What is the %>%?
 
-Structures sequence of operations from left to right, rather than inside and out!
+Structures sequence of operations from left to right, rather than inside out!
 * Avoids nested function calls
 * Minimises need for local variables
 * Easy to add steps halfway through if you forgot something
@@ -83,7 +84,8 @@ Consistent format of working with tidy data (a column per variable, a row per ob
 * First argument is a dataframe
 * Subsequent argument describes what to do with that dataframe
 * Returns a dataframe
-<img src='https://github.com/allisonhorst/stats-illustrations/blob/master/rstats-artwork/dplyr_wrangling.png?raw=true' width = '800px' height = '400px'>
+
+.pull-right[<img src='https://github.com/allisonhorst/stats-illustrations/blob/master/rstats-artwork/dplyr_wrangling.png?raw=true' width = '800px' height = '400px'>]
 
 ---
 
@@ -91,13 +93,13 @@ Consistent format of working with tidy data (a column per variable, a row per ob
 
 ```{r dplyr example, eval = FALSE}
 outcome <- data %>%
-  dplyr::filter(country == 'UK') %>%
-  dplyr::select(trust_id, year, region, male, female) %>%
-  dplyr::mutate(patients = male + female) %>%
-  dplyr::group_by(region, year) %>%
-  dplyr::summarise(avg_patients = mean(patients)) %>%
-  dplyr::ungroup() %>%
-  dplyr::arrange(year)
+  filter(country == 'UK') %>%
+  select(trust_id, year, region, male, female) %>%
+  mutate(patients = male + female) %>%
+  group_by(region, year) %>%
+  summarise(avg_patients = mean(patients)) %>%
+  ungroup() %>%
+  arrange(year)
 ```
 
 ---
@@ -117,7 +119,7 @@ library(dplyr)
 library(magrittr)
 ```
 
-![](https://media1.giphy.com/media/bkvdYeBEGeSE8/giphy.gif)
+.pull-right[![](https://media1.giphy.com/media/bkvdYeBEGeSE8/giphy.gif)]
 
 ---
 
@@ -212,6 +214,8 @@ str(ae[, 'type'])
 
 x is the left-hand circle; y is the right-hand circle. 
 
+You can also use brackets, the way you would in mathematics. 
+
 ---
 
 # mutate()
@@ -234,13 +238,13 @@ ae %>%
 
 # mutate() helper functions
 
-* Arithmetic operators (+, -, *, /, ^)
-* Log functions (like log10())
-* Offsets (like lead() and lag())
-* Logical comparisons (<, <=, >, >=, !=)
-* ifelse statement (if more than 1 logical split: dplyr::case_when())
-* Cumulative and rolling aggregates using {zoo}
-* Check mutate_at and mutate_if
+* Arithmetic operators (**+, -, *, /, ^**)
+* Log functions (like **log10()**)
+* Offsets (like **lead()** and **lag()**)
+* Logical comparisons (**<, <=, >, >=, !=, and %in%**)
+* ifelse statement (if more than 1 logical split: **dplyr::case_when()**)
+* Cumulative and rolling aggregates using **{zoo}**
+* Check **mutate_at** and **mutate_if**
 
 ```{r mutate example}
 ae %>%
@@ -319,7 +323,7 @@ ae %>%
 
 ---
 
-# The main functions
+# Functions recap
 
 <img src='https://itsalocke.com/blog/img/dplyr_schema.png' height = '400px' width = '700px'>
 
@@ -327,6 +331,125 @@ Source: https://itsalocke.com/blog/data-manipulation-in-r/
 
 ---
 
+# Exercises
 
+Load the NHSRdatasets data
 
+```{r install nhsR ex, eval = FALSE}
+install.packages('NHSRdatasets')
+ae <- NHSRdatasets::ae_attendances
+```
+
+### Challenges:
+
+* The organisation with the most attendances in 2017
+* The type of organisation with the highest average admission-to-attendance ratio
+* In 2018, how many organisations had more than 1000 breaches in at least one month?
+
+### If you finish early:
+* Which year had the most admissions?
+* Are there more breaches during the winter months?
+
+---
+
+# Exercises: answers
+
+* The organisation with the most attendances in 2017
+
+--
+
+```{r ex 1}
+ae %>%
+  dplyr::filter(period >= '2017-01-01' & period < '2018-01-01') %>%
+  dplyr::group_by(org_code) %>%
+  dplyr::summarise(tot_att_17 = sum(attendances)) %>%
+  dplyr::arrange(desc(tot_att_17)) %>%
+  head()
+```
+
+---
+
+# Exercises: answers
+
+* The type of organisation with the highest average admission-to-attendance ratio
+
+--
+
+```{r ex 2}
+ae %>%
+  dplyr::mutate(ratio = admissions / attendances) %>%
+  dplyr::group_by(type) %>%
+  dplyr::summarise(avg_ratio = mean(ratio)) %>%
+  dplyr::arrange(desc(avg_ratio)) %>%
+  head()
+```
+
+---
+
+# Exercises: answers
+
+* In 2018, how many organisations had more than 1000 breaches in at least one month?
+
+--
+
+```{r ex 3}
+ae %>%
+  dplyr::filter(period >= '2018-01-01' & period < '2019-01-01') %>%
+  dplyr::group_by(org_code) %>%
+  dplyr::mutate(most_breaches = max(breaches)) %>%
+  dplyr::filter(most_breaches > 1000) %>%
+  dplyr::select(org_code, most_breaches) %>%
+  unique(.) %>%
+  nrow(.)
+```
+
+---
+
+# Exercises: answers
+
+* Which year had the most admissions?
+
+--
+
+```{r ex 4}
+ae %>%
+  dplyr::mutate(year = format(period, '%Y')) %>%
+  dplyr::group_by(year) %>%
+  dplyr::summarise(tot_adm = sum(admissions)) %>%
+  dplyr::arrange(desc(tot_adm))
+```
+
+---
+
+# Exercises: answers
+
+* Are there more breaches during the winter months?
+
+--
+
+```{r ex 5}
+ae %>%
+  dplyr::mutate(month = format(period, '%m')) %>%
+  dplyr::mutate(winter = month %in% c('11', '12', '01', '02')) %>%
+  dplyr::group_by(winter) %>%
+  dplyr::summarise(tot_br = sum(breaches),
+                   tot_months = length(unique(month))) %>%
+  dplyr::mutate(br_per_month = tot_br / tot_months)
+```
+
+---
+
+# Acknowledgments
+
+.pull-left[
+**Art**: [@allison_horst](https://twitter.com/allison_horst) at RStudio
+
+**Data**: NHS R Community - https://nhsrcommunity.com/
+
+**Workshop structure**: R-Ladies Rotterdam GitHub repository - Paloma RS ([@palolili23](https://twitter.com/palolili23))
+]
+
+.pull-right[
+![](https://github.com/allisonhorst/stats-illustrations/blob/master/rstats-artwork/r_first_then.png?raw=true)
+]
 
