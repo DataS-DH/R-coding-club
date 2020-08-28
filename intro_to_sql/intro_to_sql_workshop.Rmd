@@ -1,0 +1,372 @@
+---
+title: "Intro to SQL workshop"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(warning = FALSE)
+library(sqldf)
+library(dplyr)
+library(DBI)
+```
+
+# Intro to SQL
+
+
+First lets load some data to play with. This is a table of population data from the ONS, which we have stored in a table called ons_out.
+
+```{r, echo=FALSE}
+# Load data
+ons_pop <- readxl::read_excel("ukmidyearestimates20192020ladcodes.xls", sheet = "MYE2 - Persons", skip = 3)
+# Get column names for age-aggregates
+over_18 <- colnames(ons_pop)[as.integer(colnames(ons_pop)) > 17 & !is.na(as.integer(colnames(ons_pop)))]
+over_85 <- colnames(ons_pop)[as.integer(colnames(ons_pop)) > 84 & !is.na(as.integer(colnames(ons_pop)))]
+over_65 <- colnames(ons_pop)[as.integer(colnames(ons_pop)) > 64 & !is.na(as.integer(colnames(ons_pop)))]
+# Create pre-processed data
+ons_out <- ons_pop %>%
+  dplyr::transmute(lad_code = Code, 
+                   lad_name = Name, 
+                   geo_type = Geography1, 
+                   all_ages = `All ages`,
+                   over_18 = rowSums(.[over_18]),
+                   over_85 = rowSums(.[over_85]),
+                   over_65 = rowSums(.[over_65]))
+
+print(ons_out)
+
+```
+
+## Creating a database
+
+We could create a database and add this data to a database, or we could create the database in memory using the `":memory:"` instead of the database name
+```{r}
+mydb <- dbConnect(RSQLite::SQLite(), "my-sqlite-db.sqlite")
+
+dbWriteTable(mydb, "my_table", ons_pop, overwrite=T)
+```
+**Note**, the my-sqlite-db.sqlite appears in my folder.  
+If I wanted to add data to an existing table I would replace the `overwrite=T` with `append=T`
+
+I can also list the tables in my database - I find this useful as I forget the names
+```{r}
+dbListTables(mydb)
+```
+
+Also, when you finish with a database you need to disconnect
+```{r}
+dbDisconnect(mydb)
+```
+
+
+
+We'll now review how to select the data we want from this table, using 'SELECT' queries.
+
+In this workshop we use the sqldf package in R. This lets us query tables in R using SQL queries, as if they were tables in SQL databases.
+
+
+## Selecting columns
+
+In its simplest form, a SELECT query allows you to select some subset of columns from a table. It has the following format:
+
+SELECT \<column name 1\>, \<column name 2\>, ... FROM \<table name\>
+
+For example:
+
+```{r}
+dplyr::tibble(sqldf("
+      SELECT lad_name, all_ages FROM ons_out
+      "))
+```
+
+## Selecting new columns
+
+We can also create new columns out of the columns which already exist, and select those too, all within a single SELECT query. We can apply basic arithmetic operations to columns containing numerical values. The below query creates a new column which tells us the proportion of the population who are under 18.
+
+```{r}
+dplyr::tibble(sqldf("
+SELECT lad_name,
+all_ages,
+(all_ages - over_18) / all_ages AS prop_under_18
+FROM ons_out
+                    "))
+```
+
+## Selecting rows
+
+Suppose we don't want all the rows in the table, but only those which satisfy certain criteria. We can do this using a WHERE clause, which goes after the table name. The below SQL query only returns rows which correspond to regions.
+
+```{r}
+dplyr::tibble(sqldf("
+SELECT lad_name,
+all_ages,
+(all_ages - over_18) / all_ages AS prop_under_18
+FROM ons_out
+WHERE geo_type = 'Region'
+                    "))
+```
+
+
+Some basic operations you can use in a WHERE clause are given below:
+
+= equals
+
+\<\> not equal
+
+\< less than
+
+\> greater than
+
+NOT not
+
+You can also combine conditions using AND and OR. For example, suppose we want all the rows below the level of country and region:
+
+```{r}
+dplyr::tibble(sqldf("
+SELECT lad_name,
+all_ages,
+(all_ages - over_18) / all_ages AS prop_under_18
+FROM ons_out
+WHERE NOT (geo_type = 'Region' OR geo_type = 'Country')
+                    "))
+```
+
+A slightly more complicated relation that you can use for comparing strings is LIKE. The '%' symbol can be used as a wildcard. For example, if for some reason we wanted to know the population statistics for all local authorities which begin with 'H':
+
+```{r}
+dplyr::tibble(sqldf("
+SELECT lad_name,
+all_ages,
+(all_ages - over_18) / all_ages AS prop_under_18
+FROM ons_out
+WHERE lad_name LIKE 'H%'
+                    "))
+```
+
+
+## Sorting the output
+
+Suppose we want to list the regions in decreasing order of their proportion of 18 year olds, and then use population to break ties (higher populations placed higher). We can do this using ORDER BY:
+
+```{r}
+dplyr::tibble(sqldf("
+SELECT lad_name,
+all_ages,
+(all_ages - over_18) / all_ages AS prop_under_18
+FROM ons_out
+WHERE geo_type = 'Region'
+ORDER BY prop_under_18 desc, all_ages
+                    "))
+```
+
+## Joining tables together
+
+Below is a second table, le_all, which contains life expectancy statistics at an LA level.
+
+```{r, echo=FALSE}
+load_le <- function(sheet_name){
+  # Read data, remove empty rows
+  le <- readxl::read_excel("leatbirthandatage65byukla201618.xlsx", sheet = sheet_name, skip= 2) %>%
+    dplyr::filter(!is.na(`Area Codes`))
+  # Set column names
+  colnames(le) <- c(c('lad_code', 'area_name', 'county', 'district'), colnames(le)[5:ncol(le)])
+  # Fill Local Authority names into single column
+  tidied_le <- le %>%
+    tidyr::pivot_longer(cols = -(lad_code:district),
+                        names_to = 'year',
+                        values_to = 'le') %>%
+    dplyr::mutate(lad_name = ifelse(is.na(area_name) & is.na(county), district,
+                                    ifelse(is.na(area_name), county,
+                                           area_name))) %>%
+    # Only keep latest year
+    dplyr::filter(year == max(year)) %>%
+    # Pivot back to a single column, named based on sheet name
+    tidyr::pivot_wider(id_cols = c(lad_code, lad_name),
+                       names_from = year,
+                       names_prefix = paste0(gsub(' ', '_', sheet_name), '_'),
+                       values_from = le)
+  return(tidied_le)
+}
+le_males <- load_le("LE at age 65 - Males")
+le_females <- load_le("LE at age 65 - Females")
+
+le_all <- dplyr::full_join(le_males, le_females, by = c("lad_code", "lad_name"))
+
+colnames(le_all) <- c("lad_code", "lad_name", "le_at_65_males", "le_at_65_females")
+
+print(le_all)
+```
+
+Suppose we want to join this table to our original table, to create a single table with both population and life expectancy data for each LA. This is straightforward to do in SQL. We just need to specify a condition for when to match rows together. Here, we can match on the lad_code columns in each table.
+
+```{r}
+dplyr::tibble(sqldf("
+SELECT ons_out.lad_name, all_ages, le_at_65_males, le_at_65_females
+FROM ons_out INNER JOIN le_all ON ons_out.lad_code = le_all.lad_code
+                    "))
+```
+
+
+Note that because "lad_name" is a column name in both tables, we need to specify which table we mean when we refer to that column in the select query.
+
+If a lad_code had appeared multiple times in either table, every possible match will be returned in the joined tables.
+
+Also note that here we used an INNER JOIN. There are actually 4 different kinds of join that you can choose from.
+
+### INNER JOIN
+
+With an INNER JOIN, if a row in one table has no match in the other table, then it will be excluded from the results. In this case, Great Britain did not appear as a row in the life expectancy table, so it is missing above, as we can verify by adding a WHERE clause:
+
+```{r}
+dplyr::tibble(sqldf("
+SELECT ons_out.lad_name, all_ages, le_at_65_males, le_at_65_females
+FROM ons_out INNER JOIN le_all ON ons_out.lad_code = le_all.lad_code
+WHERE ons_out.lad_name = 'GREAT BRITAIN'
+                    "))
+```
+
+### LEFT JOIN
+
+With a LEFT JOIN, all rows in the left table will be included in the results. If a row in the left table has no match in the right table, then missing values will be entered in the corresponding columns. However, with a LEFT JOIN, rows in the right table with no match in the left table are still excluded. Below, we do a left join with ons_out on the left, and a left join with ons_out on the right, to see that Great Britain is included when ons_out is on the left but still excluded otherwise:
+
+```{r}
+dplyr::tibble(sqldf("
+SELECT ons_out.lad_name, all_ages, le_at_65_males, le_at_65_females
+FROM ons_out LEFT JOIN le_all ON ons_out.lad_code = le_all.lad_code
+WHERE ons_out.lad_name = 'GREAT BRITAIN'
+                    "))
+```
+
+Note that although GREAT BRITAIN now appears, its life expectancy stats are missing, because there was no GREAT BRITAIN entry in the life expectancy table.
+
+```{r}
+dplyr::tibble(sqldf("
+SELECT ons_out.lad_name, all_ages, le_at_65_males, le_at_65_females
+FROM le_all LEFT JOIN ons_out ON ons_out.lad_code = le_all.lad_code
+WHERE ons_out.lad_name = 'GREAT BRITAIN'
+                    "))
+```
+
+If ons_out is on the right, then GREAT BRITAIN is still excluded when we do a LEFT JOIN, as it has no match in the left hand table.
+
+### RIGHT JOIN
+
+A RIGHT JOIN is the opposite of a LEFT JOIN. All rows in the right hand table are included in the joined table, but rows in the left hand table with no match are excluded.
+
+### FULL OUTER JOIN
+
+All rows in both tables are included.
+
+
+### UNION
+This is the sql equivalent of rbind.  I'll just split the data into two tables, add them to the database and then UNION them to get the original table
+```{r}
+table1 <- dbGetQuery(mydb, "SELECT * FROM my_table WHERE rowid  <= 214") 
+dbWriteTable(mydb, "Table1", table1, overwrite=T)
+
+table2 <- dbGetQuery(mydb, "SELECT * FROM my_table WHERE rowid  > 214") 
+dbWriteTable(mydb, "Table2", table2, overwrite=T)
+```
+
+These tables now appear in the database
+```{r}
+dbListTables(mydb)
+```
+
+
+```{r}
+table3 <- dbGetQuery(mydb, 
+"SELECT * FROM Table1 
+UNION ALL
+SELECT * FROM Table2")
+```
+
+```{r}
+dim(table3)
+```
+
+
+
+
+## Applying operations over multiple rows
+
+We have already seen how to perform row by row operations, when we computed a new column containing the proportion of the population who are under 18. But what if we want to perform some operation involving multiple rows? SQL has several inbuilt functions which allow us to do this.
+
+Suppose we want to know the total number of people who live in metropolitan districts. We can use the WHERE clause to only return rows corresponding to metropolitan districts, and use the sum(.) function to add up all the rows:
+
+```{r}
+dplyr::tibble(sqldf("
+SELECT sum(all_ages) AS total_pop_in_met_districts
+FROM ons_out WHERE geo_type = 'Metropolitan District'
+                    "))
+```
+
+Other functions you can apply here include mean(.), max(.), min(.).
+
+But what if we want to apply the operation not to all rows, but within certain groups of rows? For example, suppose I want to take all of the sub-national and sub-regional geo_types, and for each one, compute the proportion of the population below 18. We can do that using GROUP BY, which ensures that the operations will be applied within each group:
+
+```{r}
+dplyr::tibble(sqldf("
+SELECT geo_type, sum(all_ages) AS population,
+(sum(all_ages) - sum(over_18)) / sum(all_ages) AS prop_below_18
+FROM ons_out
+WHERE NOT (geo_type = 'Region' OR geo_type = 'Country')
+GROUP BY geo_type
+                    "))
+```
+
+The sum operation is now applied within each group, instead of over every row.
+
+Finally, suppose we wanted to only include geo_types with more than 2 million people living in them. Unfortunately, in SQL you cannot include aggregation functions like sum(.) inside the WHERE clause (the WHERE clause is used to select the rows of the table before the grouping is applied). If you want to do an additional selection on your final output, you can use HAVING. This works just like WHERE, and goes at the end. For example:
+
+```{r}
+dplyr::tibble(sqldf("
+SELECT geo_type, sum(all_ages) AS population,
+(sum(all_ages) - sum(over_18)) / sum(all_ages) AS prop_below_18
+FROM ons_out
+WHERE NOT (geo_type = 'Region' OR geo_type = 'Country')
+GROUP BY geo_type
+HAVING population > 2000000
+                    "))
+```
+
+
+## Putting it all together
+
+The below query shows the total population living under each geography type, the proportion of that population that is under 18, and the life expectancy of a 65 year old male or 65 year old female living in that geography type (which needs to be computed by a weighted average), where the total population in the geography type is more than 2 million, and sorted in decreasing order of their percentage of under 18s. Strictly speaking, we should use the population of 65 year olds in each area to weight the average, but here we weight by total population for simplicity.
+
+```{r}
+dplyr::tibble(sqldf("
+SELECT geo_type,
+sum(all_ages) AS population,
+(sum(all_ages) - sum(over_18)) / sum(all_ages) AS prop_below_18,
+sum(all_ages * le_at_65_males) / sum(all_ages) AS av_le_at_65_males,
+sum(all_ages * le_at_65_females) / sum(all_ages) AS av_le_at_65_females
+FROM ons_out LEFT JOIN le_all ON ons_out.lad_code = le_all.lad_code
+WHERE NOT (geo_type = 'Region' OR geo_type = 'Country')
+GROUP BY geo_type
+HAVING population > 2000000
+ORDER BY prop_below_18 desc
+                    "))
+```
+
+Note that metropolitan districts are clearly contained within metropolitan counties, and the life expectancy for females will be slightly off because we used total population instead of population of 65 year olds to weight the average.
+
+## Dynamic SQL
+
+In this workshop, we have been running all of our SQL queries from inside R. This is not necessarily how you would normally use SQL. If you are working with a database, you will typically have access to some software which lets you enter SQL queries directly and execute them.
+
+However, there is an advantage to running SQL queries from inside a programming language like R or python. Because R views the SQL queries as just ordinary strings, we can manipulate them like strings, and generate our queries dynamically.
+
+For example, suppose we wanted to create 3 population tables: one for countries, one for regions, and one for unitary authorities. If you were writing raw SQL code, the simplest way to do this would probably be to write out 3 full SQL queries, one for each table, differing only in the name of the geo_type being selected. But if we're running our SQL queries from inside R, we can do something like this:
+
+```{r}
+for (g_type in c("Country", "Region", "Unitary Authority")) {
+  print(dplyr::tibble(sqldf(paste0("
+                                    SELECT lad_name, all_ages
+                                    FROM ons_out WHERE geo_type = '", g_type, "'
+                                    ORDER BY all_ages desc
+                                  "))))
+}
+```
+
