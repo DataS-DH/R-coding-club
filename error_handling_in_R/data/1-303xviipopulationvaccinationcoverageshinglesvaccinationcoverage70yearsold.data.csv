@@ -1,0 +1,397 @@
+Area Code,Area Name,AreaType,Sex,Age,Category Type,Category,Time period,Value,Lower CI limit,Upper CI limit,Count,Denominator,Value note
+E12000001,North East region,Region,Persons,70,,,2014/15,61.49910054,60.89437817,62.10029171,15384,25015,Value estimated from former primary care organisations covered by the LA
+E12000002,North West region,Region,Persons,70,,,2014/15,59.79428021,59.42078779,60.16663944,39704,66401,Value estimated from former primary care organisations covered by the LA
+E12000003,Yorkshire and the Humber region,Region,Persons,70,,,2014/15,60.12094515,59.6983761,60.54201199,31118,51759,Value estimated from former primary care organisations covered by the LA
+E12000004,East Midlands region,Region,Persons,70,,,2014/15,62.01607319,61.57937177,62.45083762,29555,47657,Value estimated from former primary care organisations covered by the LA
+E12000005,West Midlands region,Region,Persons,70,,,2014/15,59.17828804,58.76527189,59.59001205,32293,54569,Value estimated from former primary care organisations covered by the LA
+E12000006,East of England region,Region,Persons,70,,,2014/15,58.33624607,57.94151505,58.72991114,35049,60081,Value estimated from former primary care organisations covered by the LA
+E12000007,London region,Region,Persons,70,,,2014/15,48.7285086,48.2905911,49.16662137,24374,50020,Value estimated from former primary care organisations covered by the LA
+E12000008,South East region,Region,Persons,70,,,2014/15,60.28651568,59.95956919,60.61254621,52014,86278,Value estimated from former primary care organisations covered by the LA
+E12000009,South West region,Region,Persons,70,,,2014/15,61.32917482,60.93969351,61.71721224,36968,60278,Value estimated from former primary care organisations covered by the LA
+E06000001,Hartlepool,UA,Persons,70,,,2014/15,41.30162703,37.93710932,44.7493852,330,799,Value estimated from former primary care organisations covered by the LA
+E06000002,Middlesbrough,UA,Persons,70,,,2014/15,54.02843602,51.01193899,57.01570285,570,1055,Value estimated from former primary care organisations covered by the LA
+E06000003,Redcar and Cleveland,UA,Persons,70,,,2014/15,64.07322654,61.43844802,66.62577201,840,1311,Value estimated from former primary care organisations covered by the LA
+E06000004,Stockton-on-Tees,UA,Persons,70,,,2014/15,63.77816291,61.48572507,66.0095828,1104,1731,Value estimated from former primary care organisations covered by the LA
+E06000005,Darlington,UA,Persons,70,,,2014/15,61.98019802,58.94636462,64.92324515,626,1010,Value estimated from former primary care organisations covered by the LA
+E06000006,Halton,UA,Persons,70,,,2014/15,50.94850949,48.00545389,53.8850049,564,1107,Value estimated from former primary care organisations covered by the LA
+E06000007,Warrington,UA,Persons,70,,,2014/15,60.81694402,58.64944275,62.94261726,1206,1983,Value estimated from former primary care organisations covered by the LA
+E06000008,Blackburn with Darwen,UA,Persons,70,,,2014/15,62.07171315,59.354275,64.71547563,779,1255,Value estimated from former primary care organisations covered by the LA
+E06000009,Blackpool,UA,Persons,70,,,2014/15,58.01041064,55.66881851,60.31648693,1003,1729,Value estimated from former primary care organisations covered by the LA
+E06000010,Kingston upon Hull,UA,Persons,70,,,2014/15,53.15449578,50.97068829,55.32628659,1070,2013,Value estimated from former primary care organisations covered by the LA
+E06000011,East Riding of Yorkshire,UA,Persons,70,,,2014/15,56.49801587,54.96230884,58.02135281,2278,4032,Value estimated from former primary care organisations covered by the LA
+E06000012,North East Lincolnshire,UA,Persons,70,,,2014/15,58.1495098,55.73972937,60.52101513,949,1632,Value estimated from former primary care organisations covered by the LA
+E06000013,North Lincolnshire,UA,Persons,70,,,2014/15,53.1234129,50.91529399,55.31936818,1046,1969,Value estimated from former primary care organisations covered by the LA
+E06000014,York,UA,Persons,70,,,2014/15,59.65082444,57.51724343,61.74851379,1230,2062,Value estimated from former primary care organisations covered by the LA
+E06000015,Derby,UA,Persons,70,,,2014/15,61.17596195,59.17289263,63.14197048,1415,2313,Value estimated from former primary care organisations covered by the LA
+E06000016,Leicester,UA,Persons,70,,,2014/15,52.63157895,50.47826091,54.77515252,1090,2071,Value estimated from former primary care organisations covered by the LA
+E06000017,Rutland,UA,Persons,70,,,2014/15,67.97520661,63.69098805,71.97633724,329,484,Value cannot be calculated as number of cases is too small
+E06000018,Nottingham,UA,Persons,70,,,2014/15,58.78609887,56.63716279,60.90205591,1201,2043,Value estimated from former primary care organisations covered by the LA
+E06000019,Herefordshire,UA,Persons,70,,,2014/15,61.07865169,59.03529649,63.08381826,1359,2225,Value estimated from former primary care organisations covered by the LA
+E06000020,Telford and Wrekin,UA,Persons,70,,,2014/15,58.6582049,55.72688811,61.52942249,647,1103,Value estimated from former primary care organisations covered by the LA
+E06000021,Stoke-on-Trent,UA,Persons,70,,,2014/15,62.8959276,60.95665129,64.794512,1529,2431,Value estimated from former primary care organisations covered by the LA
+E06000022,Bath and North East Somerset,UA,Persons,70,,,2014/15,65.45918367,63.3256918,67.5321963,1283,1960,Value estimated from former primary care organisations covered by the LA
+E06000023,Bristol,UA,Persons,70,,,2014/15,57.81830463,56.03051305,59.5858363,1712,2961,Value estimated from former primary care organisations covered by the LA
+E06000024,North Somerset,UA,Persons,70,,,2014/15,58.45857418,56.55140607,60.34073633,1517,2595,Value estimated from former primary care organisations covered by the LA
+E06000025,South Gloucestershire,UA,Persons,70,,,2014/15,65.75936884,63.88958944,67.58145801,1667,2535,Value estimated from former primary care organisations covered by the LA
+E06000026,Plymouth,UA,Persons,70,,,2014/15,59.1561939,57.10108027,61.17978813,1318,2228,Value estimated from former primary care organisations covered by the LA
+E06000027,Torbay,UA,Persons,70,,,2014/15,59.30506478,56.94994632,61.61817577,1007,1698,Value estimated from former primary care organisations covered by the LA
+E06000028,Bournemouth,UA,Persons,70,,,2014/15,57.79403489,55.48331669,60.07112801,1027,1777,Value estimated from former primary care organisations covered by the LA
+E06000029,Poole,UA,Persons,70,,,2014/15,60.43899949,58.25526761,62.58187123,1184,1959,Value estimated from former primary care organisations covered by the LA
+E06000030,Swindon,UA,Persons,70,,,2014/15,59.04595695,56.70366359,61.34791036,1015,1719,Value estimated from former primary care organisations covered by the LA
+E06000031,Peterborough,UA,Persons,70,,,2014/15,55.18606492,52.43182259,57.90885572,697,1263,Value estimated from former primary care organisations covered by the LA
+E06000032,Luton,UA,Persons,70,,,2014/15,57.74240232,55.12014705,60.32173475,798,1382,Value estimated from former primary care organisations covered by the LA
+E06000033,Southend-on-Sea,UA,Persons,70,,,2014/15,46.62162162,44.3113267,48.94649975,828,1776,Value estimated from former primary care organisations covered by the LA
+E06000034,Thurrock,UA,Persons,70,,,2014/15,45.46979866,42.66209054,48.30661194,542,1192,Value estimated from former primary care organisations covered by the LA
+E06000035,Medway,UA,Persons,70,,,2014/15,57.93357934,55.96342112,59.87878586,1413,2439,Value estimated from former primary care organisations covered by the LA
+E06000036,Bracknell Forest,UA,Persons,70,,,2014/15,65.49893843,62.40582763,68.46615385,617,942,Value estimated from former primary care organisations covered by the LA
+E06000037,West Berkshire,UA,Persons,70,,,2014/15,64.49885233,61.86559451,67.04713154,843,1307,Value estimated from former primary care organisations covered by the LA
+E06000038,Reading,UA,Persons,70,,,2014/15,62.19346049,59.68416122,64.63911068,913,1468,Value estimated from former primary care organisations covered by the LA
+E06000039,Slough,UA,Persons,70,,,2014/15,55.19379845,51.33650187,58.98959537,356,645,Value estimated from former primary care organisations covered by the LA
+E06000040,Windsor and Maidenhead,UA,Persons,70,,,2014/15,63.79585327,61.09749376,66.40994746,800,1254,Value estimated from former primary care organisations covered by the LA
+E06000041,Wokingham,UA,Persons,70,,,2014/15,53.02795031,50.29738554,55.74050707,683,1288,Value estimated from former primary care organisations covered by the LA
+E06000042,Milton Keynes,UA,Persons,70,,,2014/15,64.85813838,62.74395604,66.91560793,1303,2009,Value estimated from former primary care organisations covered by the LA
+E06000043,Brighton and Hove,UA,Persons,70,,,2014/15,48.57288481,46.3663098,50.78503728,953,1962,Value estimated from former primary care organisations covered by the LA
+E06000044,Portsmouth,UA,Persons,70,,,2014/15,56.93135935,54.39902347,59.42795113,846,1486,Value estimated from former primary care organisations covered by the LA
+E06000045,Southampton,UA,Persons,70,,,2014/15,57.74958632,55.46181567,60.00458613,1047,1813,Value estimated from former primary care organisations covered by the LA
+E06000046,Isle of Wight,UA,Persons,70,,,2014/15,61.8351841,59.50927255,64.10807108,1058,1711,Value estimated from former primary care organisations covered by the LA
+E06000047,County Durham,UA,Persons,70,,,2014/15,62.07018788,60.79629278,63.32765775,3502,5642,Value estimated from former primary care organisations covered by the LA
+E06000049,Cheshire East,UA,Persons,70,,,2014/15,64.48163645,63.03922602,65.89820727,2774,4302,Value estimated from former primary care organisations covered by the LA
+E06000050,Cheshire West and Chester,UA,Persons,70,,,2014/15,61.48170012,59.83093552,63.10645732,2083,3388,Value estimated from former primary care organisations covered by the LA
+E06000051,Shropshire,UA,Persons,70,,,2014/15,67.11464619,65.57240012,68.62086592,2447,3646,Value estimated from former primary care organisations covered by the LA
+E06000052,Cornwall,UA,Persons,70,,,2014/15,61.5028545,60.31172476,62.68035623,3986,6481,Value for Cornwall & Isles of Scilly combined
+E06000053,Isles of Scilly,UA,Persons,70,,,2014/15,77.77777778,61.91529705,88.28366802,28,36,Value cannot be calculated as number of cases is too small
+E06000054,Wiltshire,UA,Persons,70,,,2014/15,57.44075829,56.10154767,58.76913951,3030,5275,Value estimated from former primary care organisations covered by the LA
+E06000055,Bedford,UA,Persons,70,,,2014/15,62.35212248,59.81726982,64.82111061,896,1437,Value estimated from former primary care organisations covered by the LA
+E06000056,Central Bedfordshire,UA,Persons,70,,,2014/15,63.41840681,61.54336877,65.25363835,1640,2586,Value estimated from former primary care organisations covered by the LA
+E06000057,Northumberland,UA,Persons,70,,,2014/15,63.54025481,61.97372212,65.07861715,2344,3689,Value estimated from former primary care organisations covered by the LA
+E08000001,Bolton,UA,Persons,70,,,2014/15,64.51733135,62.68731129,66.30583966,1731,2683,Value estimated from former primary care organisations covered by the LA
+E08000002,Bury,UA,Persons,70,,,2014/15,55.43710021,53.17911009,57.6728689,1040,1876,Value estimated from former primary care organisations covered by the LA
+E08000003,Manchester,UA,Persons,70,,,2014/15,55.32069971,53.45437546,57.17214737,1518,2744,Value estimated from former primary care organisations covered by the LA
+E08000004,Oldham,UA,Persons,70,,,2014/15,60.71805702,58.49903531,62.89368947,1150,1894,Value estimated from former primary care organisations covered by the LA
+E08000005,Rochdale,UA,Persons,70,,,2014/15,61.49137451,59.21924482,63.71447863,1105,1797,Value estimated from former primary care organisations covered by the LA
+E08000006,Salford,UA,Persons,70,,,2014/15,47.94591784,45.71937522,50.18065072,922,1923,Value estimated from former primary care organisations covered by the LA
+E08000007,Stockport,UA,Persons,70,,,2014/15,60.03153331,58.11168891,61.92104467,1523,2537,Value estimated from former primary care organisations covered by the LA
+E08000008,Tameside,UA,Persons,70,,,2014/15,60.12691698,57.90165923,62.31111362,1137,1891,Value estimated from former primary care organisations covered by the LA
+E08000009,Trafford,UA,Persons,70,,,2014/15,63.0983016,60.92884337,65.21606934,1226,1943,Value estimated from former primary care organisations covered by the LA
+E08000010,Wigan,UA,Persons,70,,,2014/15,57.28802795,55.55247744,59.00581881,1804,3149,Value estimated from former primary care organisations covered by the LA
+E08000011,Knowsley,UA,Persons,70,,,2014/15,55.93667546,53.03575441,58.79761638,636,1137,Value estimated from former primary care organisations covered by the LA
+E08000012,Liverpool,UA,Persons,70,,,2014/15,56.1382237,54.43877209,57.82339686,1852,3299,Value estimated from former primary care organisations covered by the LA
+E08000013,St. Helens,UA,Persons,70,,,2014/15,61.47378833,59.3327365,63.5713263,1243,2022,Value estimated from former primary care organisations covered by the LA
+E08000014,Sefton,UA,Persons,70,,,2014/15,59.0186593,57.2160642,60.79734362,1708,2894,Value estimated from former primary care organisations covered by the LA
+E08000015,Wirral,UA,Persons,70,,,2014/15,61.58158749,59.93175074,63.20519832,2087,3389,Value estimated from former primary care organisations covered by the LA
+E08000016,Barnsley,UA,Persons,70,,,2014/15,62.3470948,60.47358577,64.18439488,1631,2616,Value estimated from former primary care organisations covered by the LA
+E08000017,Doncaster,UA,Persons,70,,,2014/15,60.93849081,59.22347035,62.62689829,1922,3154,Value estimated from former primary care organisations covered by the LA
+E08000018,Rotherham,UA,Persons,70,,,2014/15,57.43944637,55.52970037,59.32724989,1494,2601,Value estimated from former primary care organisations covered by the LA
+E08000019,Sheffield,UA,Persons,70,,,2014/15,55.54263566,54.18317087,56.89385395,2866,5160,Value estimated from former primary care organisations covered by the LA
+E08000021,Newcastle upon Tyne,UA,Persons,70,,,2014/15,62.56926952,60.41797474,64.67200906,1242,1985,Value estimated from former primary care organisations covered by the LA
+E08000022,North Tyneside,UA,Persons,70,,,2014/15,61.32215096,59.18250925,63.41895961,1243,2027,Value estimated from former primary care organisations covered by the LA
+E08000023,South Tyneside,UA,Persons,70,,,2014/15,66.48976497,63.89776149,68.98599772,877,1319,Value estimated from former primary care organisations covered by the LA
+E08000024,Sunderland,UA,Persons,70,,,2014/15,62.33974359,60.42128859,64.22027409,1556,2496,Value estimated from former primary care organisations covered by the LA
+E08000025,Birmingham,UA,Persons,70,,,2014/15,51.48407987,50.34582373,52.62079848,3816,7412,Value estimated from former primary care organisations covered by the LA
+E08000026,Coventry,UA,Persons,70,,,2014/15,59.08080059,57.2138652,60.92191396,1594,2698,Value estimated from former primary care organisations covered by the LA
+E08000027,Dudley,UA,Persons,70,,,2014/15,60.6605721,59.00520731,62.29181079,2057,3391,Value estimated from former primary care organisations covered by the LA
+E08000028,Sandwell,UA,Persons,70,,,2014/15,53.71259697,51.83032321,55.58434869,1454,2707,Value estimated from former primary care organisations covered by the LA
+E08000029,Solihull,UA,Persons,70,,,2014/15,59.98229305,57.94663672,61.98405698,1355,2259,Value estimated from former primary care organisations covered by the LA
+E08000030,Walsall,UA,Persons,70,,,2014/15,54.214223,52.16289779,56.251359,1235,2278,Value estimated from former primary care organisations covered by the LA
+E08000031,Wolverhampton,UA,Persons,70,,,2014/15,57.72005772,55.58423483,59.82740385,1200,2079,Value estimated from former primary care organisations covered by the LA
+E08000032,Bradford,UA,Persons,70,,,2014/15,60.64718163,59.09047671,62.182561,2324,3832,Value estimated from former primary care organisations covered by the LA
+E08000033,Calderdale,UA,Persons,70,,,2014/15,61.7344439,59.60566484,63.81913408,1260,2041,Value estimated from former primary care organisations covered by the LA
+E08000034,Kirklees,UA,Persons,70,,,2014/15,62.94933484,61.34360829,64.52693215,2224,3533,Value estimated from former primary care organisations covered by the LA
+E08000035,Leeds,UA,Persons,70,,,2014/15,63.65532734,62.45306709,64.84076344,3967,6232,Value estimated from former primary care organisations covered by the LA
+E08000036,Wakefield,UA,Persons,70,,,2014/15,61.14206128,59.53650985,62.72379321,2195,3590,Value estimated from former primary care organisations covered by the LA
+E08000037,Gateshead,UA,Persons,70,,,2014/15,58.94413121,56.74576265,61.10734755,1150,1951,Value estimated from former primary care organisations covered by the LA
+E09000001,City of London,UA,Persons,70,,,2014/15,30.15873016,20.23769116,42.36037231,19,63,Value cannot be calculated as number of cases is too small
+E09000002,Barking and Dagenham,UA,Persons,70,,,2014/15,49.15590864,46.07724217,52.24099064,495,1007,Value estimated from former primary care organisations covered by the LA
+E09000003,Barnet,UA,Persons,70,,,2014/15,55.99060298,54.05786636,57.90534579,1430,2554,Value estimated from former primary care organisations covered by the LA
+E09000004,Bexley,UA,Persons,70,,,2014/15,53.10160428,50.83572578,55.35476592,993,1870,Value estimated from former primary care organisations covered by the LA
+E09000005,Brent,UA,Persons,70,,,2014/15,51.77926766,49.5538481,53.99765115,1004,1939,Value estimated from former primary care organisations covered by the LA
+E09000006,Bromley,UA,Persons,70,,,2014/15,52.4738676,50.64475249,54.29636907,1506,2870,Value estimated from former primary care organisations covered by the LA
+E09000007,Camden,UA,Persons,70,,,2014/15,48.54740061,45.84710682,51.25620169,635,1308,Value estimated from former primary care organisations covered by the LA
+E09000008,Croydon,UA,Persons,70,,,2014/15,53.56690587,51.55445362,55.56780899,1269,2369,Value estimated from former primary care organisations covered by the LA
+E09000009,Ealing,UA,Persons,70,,,2014/15,42.92475154,40.82901257,45.04616959,907,2113,Value estimated from former primary care organisations covered by the LA
+E09000010,Enfield,UA,Persons,70,,,2014/15,51.179941,49.00745476,53.34797872,1041,2034,Value estimated from former primary care organisations covered by the LA
+E09000011,Greenwich,UA,Persons,70,,,2014/15,46.17985125,43.65226706,48.72722844,683,1479,Value estimated from former primary care organisations covered by the LA
+E09000012,Hackney,UA,Persons,70,,,2014/15,41.05378705,37.90341439,44.27929078,374,911,Value for Hackney and City of London combined
+E09000013,Hammersmith and Fulham,UA,Persons,70,,,2014/15,32.98578199,30.21492634,35.88009223,348,1055,Value estimated from former primary care organisations covered by the LA
+E09000014,Haringey,UA,Persons,70,,,2014/15,48.08219178,45.52774177,50.64670733,702,1460,Value estimated from former primary care organisations covered by the LA
+E09000015,Harrow,UA,Persons,70,,,2014/15,51.55350978,49.20312998,53.89703736,896,1738,Value estimated from former primary care organisations covered by the LA
+E09000016,Havering,UA,Persons,70,,,2014/15,51.30630631,49.22665916,53.38144044,1139,2220,Value estimated from former primary care organisations covered by the LA
+E09000017,Hillingdon,UA,Persons,70,,,2014/15,55.84415584,53.61641964,58.04861374,1075,1925,Value estimated from former primary care organisations covered by the LA
+E09000018,Hounslow,UA,Persons,70,,,2014/15,43.7041972,41.21409465,46.22644276,656,1501,Value estimated from former primary care organisations covered by the LA
+E09000019,Islington,UA,Persons,70,,,2014/15,47.51381215,44.55773873,50.48741214,516,1086,Value estimated from former primary care organisations covered by the LA
+E09000020,Kensington and Chelsea,UA,Persons,70,,,2014/15,24.82043097,22.50799657,27.28678498,311,1253,Value estimated from former primary care organisations covered by the LA
+E09000021,Kingston upon Thames,UA,Persons,70,,,2014/15,58.63921218,55.7263194,61.49288662,655,1117,Value estimated from former primary care organisations covered by the LA
+E09000022,Lambeth,UA,Persons,70,,,2014/15,43.46060114,40.71605548,46.24583352,535,1231,Value estimated from former primary care organisations covered by the LA
+E09000023,Lewisham,UA,Persons,70,,,2014/15,48.01393728,45.43775441,50.60072504,689,1435,Value estimated from former primary care organisations covered by the LA
+E09000024,Merton,UA,Persons,70,,,2014/15,47.47557003,44.69482981,50.27205496,583,1228,Value estimated from former primary care organisations covered by the LA
+E09000025,Newham,UA,Persons,70,,,2014/15,56.02716469,53.17767818,58.83746978,660,1178,Value estimated from former primary care organisations covered by the LA
+E09000026,Redbridge,UA,Persons,70,,,2014/15,46.53692044,44.20808861,48.8809487,813,1747,Value estimated from former primary care organisations covered by the LA
+E09000027,Richmond upon Thames,UA,Persons,70,,,2014/15,52.3522316,49.94551156,54.74807696,868,1658,Value estimated from former primary care organisations covered by the LA
+E09000028,Southwark,UA,Persons,70,,,2014/15,39.69465649,36.93969286,42.51655648,468,1179,Value estimated from former primary care organisations covered by the LA
+E09000029,Sutton,UA,Persons,70,,,2014/15,58.19397993,55.67583253,60.67012578,870,1495,Value estimated from former primary care organisations covered by the LA
+E09000030,Tower Hamlets,UA,Persons,70,,,2014/15,49.93498049,46.41019489,53.46041247,384,769,Value estimated from former primary care organisations covered by the LA
+E09000031,Waltham Forest,UA,Persons,70,,,2014/15,46.35811836,43.68040874,49.05699564,611,1318,Value estimated from former primary care organisations covered by the LA
+E09000032,Wandsworth,UA,Persons,70,,,2014/15,51.54185022,49.08384257,53.9924209,819,1589,Value estimated from former primary care organisations covered by the LA
+E09000033,Westminster,UA,Persons,70,,,2014/15,31.79409538,29.33877454,34.35499449,420,1321,Value estimated from former primary care organisations covered by the LA
+E45000016,East Midlands PHE centre,PHE Centre from 2015,Persons,70,,,2014/15,62.01607319,61.57937177,62.45083762,29555,47657,Value estimated from former primary care organisations covered by the LA
+E45000017,East of England PHE centre,PHE Centre from 2015,Persons,70,,,2014/15,58.33624607,57.94151505,58.72991114,36352,62090,Value estimated from former primary care organisations covered by the LA
+E45000018,North West PHE centre,PHE Centre from 2015,Persons,70,,,2014/15,59.79428021,59.42078779,60.16663944,39704,66401,Value estimated from former primary care organisations covered by the LA
+E45000019,South East PHE centre,PHE Centre from 2015,Persons,70,,,2014/15,65.6932895,64.38813749,66.9751422,50711,84269,Value estimated from former primary care organisations covered by the LA
+E45000020,South West PHE centre,PHE Centre from 2015,Persons,70,,,2014/15,61.32917482,60.93969351,61.71721224,36968,60278,Value estimated from former primary care organisations covered by the LA
+E45000001,London PHE centre,PHE Centre from 2013,Persons,70,,,2014/15,48.7285086,48.2905911,49.16662137,24374,50020,Value estimated from former primary care organisations covered by the LA
+E45000005,West Midlands PHE centre,PHE Centre from 2013,Persons,70,,,2014/15,59.17828804,58.76527189,59.59001205,32293,54569,Value estimated from former primary care organisations covered by the LA
+E45000009,North East PHE centre,PHE Centre from 2013,Persons,70,,,2014/15,61.49910054,60.89437817,62.10029171,15384,25015,Value estimated from former primary care organisations covered by the LA
+E45000010,Yorkshire and the Humber PHE centre,PHE Centre from 2013,Persons,70,,,2014/15,60.12094515,59.6983761,60.54201199,31118,51759,Value estimated from former primary care organisations covered by the LA
+E10000002,Buckinghamshire,County,Persons,70,,,2014/15,65.6932895,64.38813749,66.9751422,3397,5171,Value estimated from former primary care organisations covered by the LA
+E10000003,Cambridgeshire,County,Persons,70,,,2014/15,65.32285045,64.10686578,66.51915486,3905,5978,Value estimated from former primary care organisations covered by the LA
+E10000006,Cumbria,County,Persons,70,,,2014/15,61.05726872,59.78153087,62.31804717,3465,5675,Value estimated from former primary care organisations covered by the LA
+E10000007,Derbyshire,County,Persons,70,,,2014/15,66.43685708,65.46194398,67.39795644,6071,9138,Value estimated from former primary care organisations covered by the LA
+E10000008,Devon,County,Persons,70,,,2014/15,64.01397903,63.06877259,64.9484389,6411,10015,Value estimated from former primary care organisations covered by the LA
+E10000009,Dorset,County,Persons,70,,,2014/15,63.26981967,62.02914939,64.49315677,3719,5878,Value estimated from former primary care organisations covered by the LA
+E10000011,East Sussex,County,Persons,70,,,2014/15,60.2120793,59.01713432,61.39497383,3918,6507,Value estimated from former primary care organisations covered by the LA
+E10000012,Essex,County,Persons,70,,,2014/15,51.94643209,51.15263419,52.73924853,7913,15233,Value estimated from former primary care organisations covered by the LA
+E10000013,Gloucestershire,County,Persons,70,,,2014/15,62.21454327,61.04301685,63.37197877,4141,6656,Value estimated from former primary care organisations covered by the LA
+E10000014,Hampshire,County,Persons,70,,,2014/15,63.07524239,62.2903226,63.85330503,9238,14646,Value estimated from former primary care organisations covered by the LA
+E10000015,Hertfordshire,County,Persons,70,,,2014/15,59.96059318,58.97885866,60.9343949,5782,9643,Value estimated from former primary care organisations covered by the LA
+E10000016,Kent,County,Persons,70,,,2014/15,58.67269985,57.90558893,59.43562427,9336,15912,Value estimated from former primary care organisations covered by the LA
+E10000017,Lancashire,County,Persons,70,,,2014/15,60.65852003,59.77317457,61.53691862,7148,11784,Value estimated from former primary care organisations covered by the LA
+E10000018,Leicestershire,County,Persons,70,,,2014/15,65.08320296,63.96096846,66.18896473,4576,7031,Value for Leicestershire and Rutland combined
+E10000019,Lincolnshire,County,Persons,70,,,2014/15,62.80419737,61.79802411,63.79939368,5626,8958,Value estimated from former primary care organisations covered by the LA
+E10000020,Norfolk,County,Persons,70,,,2014/15,61.92950959,61.00024278,62.8501191,6554,10583,Value estimated from former primary care organisations covered by the LA
+E10000021,Northamptonshire,County,Persons,70,,,2014/15,58.24838478,57.08599484,59.40168115,4057,6965,Value estimated from former primary care organisations covered by the LA
+E10000023,North Yorkshire,County,Persons,70,,,2014/15,63.93307735,62.82385341,65.02762899,4662,7292,Value estimated from former primary care organisations covered by the LA
+E10000024,Nottinghamshire,County,Persons,70,,,2014/15,59.97226716,58.93578712,60.99989786,5190,8654,Value estimated from former primary care organisations covered by the LA
+E10000025,Oxfordshire,County,Persons,70,,,2014/15,63.24157976,61.99763771,64.46813983,3699,5849,Value estimated from former primary care organisations covered by the LA
+E10000027,Somerset,County,Persons,70,,,2014/15,60.3074558,59.11275553,61.48998935,3923,6505,Value estimated from former primary care organisations covered by the LA
+E10000028,Staffordshire,County,Persons,70,,,2014/15,59.01956568,58.01662598,60.01505883,5490,9302,Value estimated from former primary care organisations covered by the LA
+E10000029,Suffolk,County,Persons,70,,,2014/15,60.99023091,59.97846873,61.99262352,5494,9008,Value estimated from former primary care organisations covered by the LA
+E10000030,Surrey,County,Persons,70,,,2014/15,55.98662207,55.03352626,56.9353244,5859,10465,Value estimated from former primary care organisations covered by the LA
+E10000031,Warwickshire,County,Persons,70,,,2014/15,59.76884104,58.55392366,60.97188261,3775,6316,Value estimated from former primary care organisations covered by the LA
+E10000032,West Sussex,County,Persons,70,,,2014/15,60.98468737,59.99452296,61.96588112,5735,9404,Value estimated from former primary care organisations covered by the LA
+E10000034,Worcestershire,County,Persons,70,,,2014/15,64.4897352,63.3377692,65.6251496,4335,6722,Value estimated from former primary care organisations covered by the LA
+E92000001,England,Country,Persons,70,,,2014/15,59.04875532,58.9126643,59.18470787,296459,502058,Value estimated from former primary care organisations covered by the LA
+E47000001,CA-Greater Manchester,Combined authorities,Persons,70,,,2014/15,58.63528992,,,13156,22437,Aggregated from all known lower geography values
+E47000002,CA-Sheffield City Region,Combined authorities,Persons,70,,,2014/15,58.4805262,,,7913,13531,Aggregated from all known lower geography values
+E47000003,CA-West Yorkshire,Combined authorities,Persons,70,,,2014/15,62.25296443,,,11970,19228,Aggregated from all known lower geography values
+E47000004,CA-Liverpool City Region,Combined authorities,Persons,70,,,2014/15,58.41998845,,,8090,13848,Aggregated from all known lower geography values
+E47000005,CA-North East,Combined authorities,Persons,70,,,2014/15,62.34758491,,,11914,19109,Aggregated from all known lower geography values
+E47000006,CA-Tees Valley,Combined authorities,Persons,70,,,2014/15,58.75380969,,,3470,5906,Aggregated from all known lower geography values
+E47000007,CA-West Midlands,Combined authorities,Persons,70,,,2014/15,55.6913775,,,12711,22824,Aggregated from all known lower geography values
+E92000001,England,Country,Persons,70,County & UA deprivation deciles in England (IMD2010),Most deprived decile (IMD2010),2014/15,53.42570962,,,16695,31249,Aggregated from all known lower geography values
+E92000001,England,Country,Persons,70,County & UA deprivation deciles in England (IMD2010),Second most deprived decile (IMD2010),2014/15,53.87630828,,,14156,26275,Aggregated from all known lower geography values
+E92000001,England,Country,Persons,70,County & UA deprivation deciles in England (IMD2010),Third more deprived decile (IMD2010),2014/15,60.39704759,,,18984,31432,Aggregated from all known lower geography values
+E92000001,England,Country,Persons,70,County & UA deprivation deciles in England (IMD2010),Fourth more deprived decile (IMD2010),2014/15,58.01177558,,,23844,41102,Aggregated from all known lower geography values
+E92000001,England,Country,Persons,70,County & UA deprivation deciles in England (IMD2010),Fifth more deprived decile (IMD2010),2014/15,56.10205761,,,17041,30375,Aggregated from all known lower geography values
+E92000001,England,Country,Persons,70,County & UA deprivation deciles in England (IMD2010),Fifth less deprived decile (IMD2010),2014/15,58.16100081,,,29615,50919,Aggregated from all known lower geography values
+E92000001,England,Country,Persons,70,County & UA deprivation deciles in England (IMD2010),Fourth less deprived decile (IMD2010),2014/15,61.29461418,,,53444,87192,Aggregated from all known lower geography values
+E92000001,England,Country,Persons,70,County & UA deprivation deciles in England (IMD2010),Third less deprived decile (IMD2010),2014/15,60.21385254,,,33957,56394,Aggregated from all known lower geography values
+E92000001,England,Country,Persons,70,County & UA deprivation deciles in England (IMD2010),Second least deprived decile (IMD2010),2014/15,59.39390373,,,50467,84970,Aggregated from all known lower geography values
+E92000001,England,Country,Persons,70,County & UA deprivation deciles in England (IMD2010),Least deprived decile (IMD2010),2014/15,61.5543041,,,38256,62150,Aggregated from all known lower geography values
+E92000001,England,Country,Persons,70,County & UA deprivation deciles in England (IMD2015),Most deprived decile (IMD2015),2014/15,55.21112016,,,18986,34388,Aggregated from all known lower geography values
+E92000001,England,Country,Persons,70,County & UA deprivation deciles in England (IMD2015),Second most deprived decile (IMD2015),2014/15,55.75998486,,,14729,26415,Aggregated from all known lower geography values
+E92000001,England,Country,Persons,70,County & UA deprivation deciles in England (IMD2015),Third more deprived decile (IMD2015),2014/15,57.25858606,,,16822,29379,Aggregated from all known lower geography values
+E92000001,England,Country,Persons,70,County & UA deprivation deciles in England (IMD2015),Fourth more deprived decile (IMD2015),2014/15,58.6781349,,,25924,44180,Aggregated from all known lower geography values
+E92000001,England,Country,Persons,70,County & UA deprivation deciles in England (IMD2015),Fifth more deprived decile (IMD2015),2014/15,55.10047553,,,17960,32595,Aggregated from all known lower geography values
+E92000001,England,Country,Persons,70,County & UA deprivation deciles in England (IMD2015),Fifth less deprived decile (IMD2015),2014/15,59.62567296,,,35330,59253,Aggregated from all known lower geography values
+E92000001,England,Country,Persons,70,County & UA deprivation deciles in England (IMD2015),Fourth less deprived decile (IMD2015),2014/15,60.52980132,,,45243,74745,Aggregated from all known lower geography values
+E92000001,England,Country,Persons,70,County & UA deprivation deciles in England (IMD2015),Third less deprived decile (IMD2015),2014/15,58.77587015,,,42656,72574,Aggregated from all known lower geography values
+E92000001,England,Country,Persons,70,County & UA deprivation deciles in England (IMD2015),Second least deprived decile (IMD2015),2014/15,61.28454755,,,41421,67588,Aggregated from all known lower geography values
+E92000001,England,Country,Persons,70,County & UA deprivation deciles in England (IMD2015),Least deprived decile (IMD2015),2014/15,61.35114291,,,37388,60941,Aggregated from all known lower geography values
+E12000001,North East region,Region,Persons,70,,,2015/16,57.11743036,56.49227734,57.74032029,13799,24159,
+E12000002,North West region,Region,Persons,70,,,2015/16,55.53588386,55.14481558,55.92626763,34505,62131,
+E12000003,Yorkshire and the Humber region,Region,Persons,70,,,2015/16,55.38585559,54.93065877,55.84015094,25421,45898,
+E12000004,East Midlands region,Region,Persons,70,,,2015/16,57.0454384,56.57271514,57.51688009,24092,42233,
+E12000005,West Midlands region,Region,Persons,70,,,2015/16,55.54431404,55.10579294,55.98197329,27450,49420,
+E12000006,East of England region,Region,Persons,70,,,2015/16,53.54147075,53.11730162,53.96512819,28468,53170,
+E12000007,London region,Region,Persons,70,,,2015/16,47.14357706,46.67558977,47.612067,20581,43656,
+E12000008,South East region,Region,Persons,70,,,2015/16,55.78602895,55.44042003,56.13107838,44322,79450,
+E12000009,South West region,Region,Persons,70,,,2015/16,56.52234784,56.11546684,56.92835194,32298,57142,
+E06000001,Hartlepool,UA,Persons,70,,,2015/16,47.4892396,43.80588652,51.20011668,331,697,
+E06000002,Middlesbrough,UA,Persons,70,,,2015/16,46.50283554,43.51544619,49.51552851,492,1058,
+E06000003,Redcar and Cleveland,UA,Persons,70,,,2015/16,57.70440252,54.97027898,60.39213135,734,1272,
+E06000004,Stockton-on-Tees,UA,Persons,70,,,2015/16,59.12627169,56.75088237,61.45979653,988,1671,
+E06000005,Darlington,UA,Persons,70,,,2015/16,56.46687697,53.29597956,59.5857401,537,951,
+E06000006,Halton,UA,Persons,70,,,2015/16,37.5,34.30482603,40.80791381,318,848,
+E06000007,Warrington,UA,Persons,70,,,2015/16,53.4502924,51.08100079,55.80411682,914,1710,
+E06000008,Blackburn with Darwen,UA,Persons,70,,,2015/16,57.11878686,54.28483716,59.90680848,678,1187,
+E06000009,Blackpool,UA,Persons,70,,,2015/16,53.43283582,51.03887562,55.81108626,895,1675,
+E06000010,Kingston upon Hull,UA,Persons,70,,,2015/16,51.75097276,49.58978787,53.90562678,1064,2056,
+E06000011,East Riding of Yorkshire,UA,Persons,70,,,2015/16,53.33333333,51.68368198,54.97572743,1880,3525,
+E06000012,North East Lincolnshire,UA,Persons,70,,,2015/16,47.86432161,45.41855097,50.32037412,762,1592,
+E06000013,North Lincolnshire,UA,Persons,70,,,2015/16,49.05778894,46.60734653,51.51276748,781,1592,
+E06000014,York,UA,Persons,70,,,2015/16,53.50285418,51.27114888,55.72062144,1031,1927,
+E06000015,Derby,UA,Persons,70,,,2015/16,56.97102242,54.68966935,59.2231543,1042,1829,
+E06000016,Leicester,UA,Persons,70,,,2015/16,43.94313968,41.54196115,46.3730105,711,1618,
+E06000017,Rutland,UA,Persons,70,,,2015/16,64.43514644,60.04418507,68.59594074,308,478,
+E06000018,Nottingham,UA,Persons,70,,,2015/16,57.86694826,55.62947492,60.0725743,1096,1894,
+E06000019,Herefordshire,UA,Persons,70,,,2015/16,57.02792239,54.90630354,59.12403391,1205,2113,
+E06000020,Telford and Wrekin,UA,Persons,70,,,2015/16,50.68587106,48.12119503,53.24694239,739,1458,
+E06000021,Stoke-on-Trent,UA,Persons,70,,,2015/16,57.50556793,55.44960668,59.53588724,1291,2245,
+E06000022,Bath and North East Somerset,UA,Persons,70,,,2015/16,58.5446527,56.26185909,60.79133323,1062,1814,
+E06000023,Bristol,UA,Persons,70,,,2015/16,52.92611558,51.05231817,54.79170174,1447,2734,
+E06000024,North Somerset,UA,Persons,70,,,2015/16,58.24308063,56.29598928,60.16480756,1452,2493,
+E06000025,South Gloucestershire,UA,Persons,70,,,2015/16,58.47563515,56.49260484,60.43158775,1404,2401,
+E06000026,Plymouth,UA,Persons,70,,,2015/16,54.28206221,52.26129192,56.28883805,1274,2347,
+E06000027,Torbay,UA,Persons,70,,,2015/16,52.58899676,49.80155733,55.36039298,650,1236,
+E06000028,Bournemouth,UA,Persons,70,,,2015/16,53.87962292,51.24145732,56.49623375,743,1379,
+E06000029,Poole,UA,Persons,70,,,2015/16,51.93266833,49.48589941,54.37020218,833,1604,
+E06000030,Swindon,UA,Persons,70,,,2015/16,52.00235571,49.62421807,54.37145377,883,1698,
+E06000031,Peterborough,UA,Persons,70,,,2015/16,57.55813953,53.83298753,61.1993582,396,688,
+E06000032,Luton,UA,Persons,70,,,2015/16,53.68956743,50.83591884,56.51925115,633,1179,
+E06000033,Southend-on-Sea,UA,Persons,70,,,2015/16,44.33234421,41.9759259,46.71454597,747,1685,
+E06000034,Thurrock,UA,Persons,70,,,2015/16,48.50615114,45.61235234,51.41000136,552,1138,
+E06000035,Medway,UA,Persons,70,,,2015/16,52.40295749,50.29635866,54.50104014,1134,2164,
+E06000036,Bracknell Forest,UA,Persons,70,,,2015/16,65.1826484,61.96784287,68.26487659,571,876,
+E06000037,West Berkshire,UA,Persons,70,,,2015/16,68.78388846,66.20364399,71.25267907,888,1291,
+E06000038,Reading,UA,Persons,70,,,2015/16,57.81132075,55.13332932,60.44414974,766,1325,
+E06000039,Slough,UA,Persons,70,,,2015/16,51.03092784,46.97620691,55.07212883,297,582,
+E06000040,Windsor and Maidenhead,UA,Persons,70,,,2015/16,53.51629503,50.64662144,56.36287539,624,1166,
+E06000041,Wokingham,UA,Persons,70,,,2015/16,49.75891996,46.72227833,52.79734111,516,1037,
+E06000042,Milton Keynes,UA,Persons,70,,,2015/16,59.37155458,57.0939213,61.60957995,1077,1814,
+E06000043,Brighton and Hove,UA,Persons,70,,,2015/16,47.22850679,44.90996545,49.55906565,835,1768,
+E06000044,Portsmouth,UA,Persons,70,,,2015/16,49.41860465,46.78222672,52.05821978,680,1376,
+E06000045,Southampton,UA,Persons,70,,,2015/16,57.67557489,55.24596555,60.06862093,928,1609,
+E06000046,Isle of Wight,UA,Persons,70,,,2015/16,49.4939759,47.34566952,51.64415244,1027,2075,
+E06000047,County Durham,UA,Persons,70,,,2015/16,57.5983965,56.28604111,58.90012197,3161,5488,
+E06000049,Cheshire East,UA,Persons,70,,,2015/16,62.82823416,61.3468754,64.28587162,2608,4151,
+E06000050,Cheshire West and Chester,UA,Persons,70,,,2015/16,59.66436919,57.98972218,61.3167911,1991,3337,
+E06000051,Shropshire,UA,Persons,70,,,2015/16,63.29738059,61.6241911,64.93912419,2054,3245,
+E06000052,Cornwall,UA,Persons,70,,,2015/16,53.75476679,52.56950205,54.93580283,3665,6818,
+E06000053,Isles of Scilly,UA,Persons,70,,,2015/16,70.96774194,53.40767067,83.90419984,22,31,
+E06000054,Wiltshire,UA,Persons,70,,,2015/16,56.64227955,55.29013656,57.98460461,2942,5194,
+E06000055,Bedford,UA,Persons,70,,,2015/16,59.43127962,56.43928983,62.35483637,627,1055,
+E06000056,Central Bedfordshire,UA,Persons,70,,,2015/16,58.92175573,56.80111474,61.00975372,1235,2096,
+E06000057,Northumberland,UA,Persons,70,,,2015/16,59.73509934,58.16149526,61.28891058,2255,3775,
+E08000001,Bolton,UA,Persons,70,,,2015/16,59.929391,57.89655041,61.92862276,1358,2266,
+E08000002,Bury,UA,Persons,70,,,2015/16,52.56166983,50.09704203,55.01387929,831,1581,
+E08000003,Manchester,UA,Persons,70,,,2015/16,48.15229563,46.2642341,50.04564848,1290,2679,
+E08000004,Oldham,UA,Persons,70,,,2015/16,57.05984893,54.70808484,59.38016651,982,1721,
+E08000005,Rochdale,UA,Persons,70,,,2015/16,58.90410959,56.58322433,61.18603373,1032,1752,
+E08000006,Salford,UA,Persons,70,,,2015/16,39.4265233,37.11226373,41.78919933,660,1674,
+E08000007,Stockport,UA,Persons,70,,,2015/16,62.83112583,60.88520104,64.73631221,1518,2416,
+E08000008,Tameside,UA,Persons,70,,,2015/16,55.58974359,53.37558458,57.78192255,1084,1950,
+E08000009,Trafford,UA,Persons,70,,,2015/16,55.26859504,53.04549862,57.47082471,1070,1936,
+E08000010,Wigan,UA,Persons,70,,,2015/16,53.08680664,51.35262047,54.8135697,1694,3191,
+E08000011,Knowsley,UA,Persons,70,,,2015/16,54.36802974,51.38164273,57.32333885,585,1076,
+E08000012,Liverpool,UA,Persons,70,,,2015/16,51.15254237,49.3484025,52.9536845,1509,2950,
+E08000013,St. Helens,UA,Persons,70,,,2015/16,58.299389,56.10463397,60.46174126,1145,1964,
+E08000014,Sefton,UA,Persons,70,,,2015/16,55.61559244,53.69562063,57.51893736,1441,2591,
+E08000015,Wirral,UA,Persons,70,,,2015/16,59.17371503,57.42578941,60.89874119,1819,3074,
+E08000016,Barnsley,UA,Persons,70,,,2015/16,59.73101266,57.80583152,61.62666487,1510,2528,
+E08000017,Doncaster,UA,Persons,70,,,2015/16,53.59725923,51.68634624,55.49766705,1408,2627,
+E08000018,Rotherham,UA,Persons,70,,,2015/16,54.34952978,52.41189513,56.27408965,1387,2552,
+E08000019,Sheffield,UA,Persons,70,,,2015/16,55.1047704,53.64551588,56.55528974,2472,4486,
+E08000021,Newcastle upon Tyne,UA,Persons,70,,,2015/16,57.93696275,55.6057949,60.23326235,1011,1745,
+E08000022,North Tyneside,UA,Persons,70,,,2015/16,56.34028892,54.08105099,58.57351723,1053,1869,
+E08000023,South Tyneside,UA,Persons,70,,,2015/16,65.39842067,62.86108411,67.85106273,911,1393,
+E08000024,Sunderland,UA,Persons,70,,,2015/16,55.27597403,53.30606446,57.22945836,1362,2464,
+E08000025,Birmingham,UA,Persons,70,,,2015/16,50.67389875,49.41759682,51.92935022,3083,6084,
+E08000026,Coventry,UA,Persons,70,,,2015/16,57.82401387,55.79747421,59.82454082,1334,2307,
+E08000027,Dudley,UA,Persons,70,,,2015/16,59.357022,57.57506525,61.11468234,1754,2955,
+E08000028,Sandwell,UA,Persons,70,,,2015/16,48.10606061,46.10172292,50.11651256,1143,2376,
+E08000029,Solihull,UA,Persons,70,,,2015/16,53.11240484,51.03901988,55.17509957,1186,2233,
+E08000030,Walsall,UA,Persons,70,,,2015/16,50.72727273,48.63871858,52.81329149,1116,2200,
+E08000031,Wolverhampton,UA,Persons,70,,,2015/16,51.90274841,49.64982267,54.14796325,982,1892,
+E08000032,Bradford,UA,Persons,70,,,2015/16,52.67614152,50.97234054,54.37373242,1742,3307,
+E08000033,Calderdale,UA,Persons,70,,,2015/16,58.93437297,56.45725573,61.36699954,907,1539,
+E08000034,Kirklees,UA,Persons,70,,,2015/16,55.74441297,54.01137806,57.46357298,1771,3177,
+E08000035,Leeds,UA,Persons,70,,,2015/16,58.61419695,57.28382794,59.93211363,3113,5311,
+E08000036,Wakefield,UA,Persons,70,,,2015/16,52.58497572,50.92902633,54.23525862,1841,3501,
+E08000037,Gateshead,UA,Persons,70,,,2015/16,54.27927928,51.95566435,56.58442214,964,1776,
+E09000001,City of London,UA,Persons,70,,,2015/16,42.1875,30.86978247,54.38996846,27,64,
+E09000002,Barking and Dagenham,UA,Persons,70,,,2015/16,47.96633941,44.3200356,51.63443946,342,713,
+E09000003,Barnet,UA,Persons,70,,,2015/16,54.22842197,52.18430109,56.25840496,1244,2294,
+E09000004,Bexley,UA,Persons,70,,,2015/16,45.76379974,43.30341014,48.24502781,713,1558,
+E09000005,Brent,UA,Persons,70,,,2015/16,51.73485241,49.50484831,53.95796771,999,1931,
+E09000006,Bromley,UA,Persons,70,,,2015/16,48.7987988,46.90376615,50.6972907,1300,2664,
+E09000007,Camden,UA,Persons,70,,,2015/16,47.64841943,44.94125984,50.36946773,618,1297,
+E09000008,Croydon,UA,Persons,70,,,2015/16,46.98397738,44.8678321,49.11102274,997,2122,
+E09000009,Ealing,UA,Persons,70,,,2015/16,45.73991031,43.28202967,48.21870676,714,1561,
+E09000010,Enfield,UA,Persons,70,,,2015/16,50.24820739,47.94860176,52.54676342,911,1813,
+E09000011,Greenwich,UA,Persons,70,,,2015/16,38.36705202,35.84067577,40.95782683,531,1384,
+E09000012,Hackney,UA,Persons,70,,,2015/16,33.87445887,30.89517677,36.98726724,313,924,
+E09000013,Hammersmith and Fulham,UA,Persons,70,,,2015/16,28.55297158,25.48302574,31.83475461,221,774,
+E09000014,Haringey,UA,Persons,70,,,2015/16,48.91380519,46.32660001,51.5068427,698,1427,
+E09000015,Harrow,UA,Persons,70,,,2015/16,50.54566341,48.19853611,52.89038804,880,1741,
+E09000016,Havering,UA,Persons,70,,,2015/16,47.51178628,45.27888021,49.75468624,907,1909,
+E09000017,Hillingdon,UA,Persons,70,,,2015/16,54.91849354,52.59819976,57.21759172,977,1779,
+E09000018,Hounslow,UA,Persons,70,,,2015/16,42.71765663,39.97898665,45.50170929,525,1229,
+E09000019,Islington,UA,Persons,70,,,2015/16,45.55765595,42.57819771,48.56925663,482,1058,
+E09000020,Kensington and Chelsea,UA,Persons,70,,,2015/16,25.61247216,22.86567993,28.56702526,230,898,
+E09000021,Kingston upon Thames,UA,Persons,70,,,2015/16,50.1980198,47.11954545,53.27499356,507,1010,
+E09000022,Lambeth,UA,Persons,70,,,2015/16,42.08400646,39.36255956,44.85442735,521,1238,
+E09000023,Lewisham,UA,Persons,70,,,2015/16,48.01762115,45.37361501,50.67277825,654,1362,
+E09000024,Merton,UA,Persons,70,,,2015/16,47.01754386,43.69284748,50.36892033,402,855,
+E09000025,Newham,UA,Persons,70,,,2015/16,51.6293279,48.50348075,54.74247728,507,982,
+E09000026,Redbridge,UA,Persons,70,,,2015/16,45.8478716,43.28256205,48.43538295,657,1433,
+E09000027,Richmond upon Thames,UA,Persons,70,,,2015/16,51.37693632,48.50337552,54.24142308,597,1162,
+E09000028,Southwark,UA,Persons,70,,,2015/16,41.37931034,38.54286164,44.27412143,468,1131,
+E09000029,Sutton,UA,Persons,70,,,2015/16,58.81513205,56.21727462,61.36478053,824,1401,
+E09000030,Tower Hamlets,UA,Persons,70,,,2015/16,46.15384615,42.42815466,49.92300319,312,676,
+E09000031,Waltham Forest,UA,Persons,70,,,2015/16,48.11229429,45.07802971,51.16054663,497,1033,
+E09000032,Wandsworth,UA,Persons,70,,,2015/16,48.92241379,46.30297633,51.54778245,681,1392,
+E09000033,Westminster,UA,Persons,70,,,2015/16,38.64447087,35.41224342,41.97996455,325,841,
+E45000016,East Midlands PHE centre,PHE Centre from 2015,Persons,70,,,2015/16,57.0454384,,,24092,42233,Aggregated from all known lower geography values
+E45000017,East of England PHE centre,PHE Centre from 2015,Persons,70,,,2015/16,53.73381347,,,29545,54984,Aggregated from all known lower geography values
+E45000018,North West PHE centre,PHE Centre from 2015,Persons,70,,,2015/16,55.53588386,,,34505,62131,Aggregated from all known lower geography values
+E45000019,South East PHE centre,PHE Centre from 2015,Persons,70,,,2015/16,55.70225153,,,43245,77636,Aggregated from all known lower geography values
+E45000020,South West PHE centre,PHE Centre from 2015,Persons,70,,,2015/16,56.52234784,,,32298,57142,Aggregated from all known lower geography values
+E45000001,London PHE centre,PHE Centre from 2013,Persons,70,,,2015/16,47.14357706,,,20581,43656,Aggregated from all known lower geography values
+E45000005,West Midlands PHE centre,PHE Centre from 2013,Persons,70,,,2015/16,55.54431404,,,27450,49420,Aggregated from all known lower geography values
+E45000009,North East PHE centre,PHE Centre from 2013,Persons,70,,,2015/16,57.11743036,,,13799,24159,Aggregated from all known lower geography values
+E45000010,Yorkshire and the Humber PHE centre,PHE Centre from 2013,Persons,70,,,2015/16,55.38585559,,,25421,45898,Aggregated from all known lower geography values
+E10000002,Buckinghamshire,County,Persons,70,,,2015/16,57.40138268,56.01411831,58.7770936,2823,4918,
+E10000003,Cambridgeshire,County,Persons,70,,,2015/16,58.97297297,57.67311333,60.26041984,3273,5550,
+E10000006,Cumbria,County,Persons,70,,,2015/16,56.64091244,55.31929215,57.95315348,3079,5436,
+E10000007,Derbyshire,County,Persons,70,,,2015/16,58.05532471,56.99804775,59.10525747,4890,8423,
+E10000008,Devon,County,Persons,70,,,2015/16,60.33559811,59.35886762,61.30415728,5861,9714,
+E10000009,Dorset,County,Persons,70,,,2015/16,54.93200536,53.57923011,56.2775283,2868,5221,
+E10000011,East Sussex,County,Persons,70,,,2015/16,56.81780435,55.56270161,58.06421298,3421,6021,
+E10000012,Essex,County,Persons,70,,,2015/16,47.94609867,47.11336452,48.77997573,6618,13803,
+E10000013,Gloucestershire,County,Persons,70,,,2015/16,57.99298022,56.76655864,59.20961051,3635,6268,
+E10000014,Hampshire,County,Persons,70,,,2015/16,57.99131216,57.15193722,58.82609013,7743,13352,
+E10000015,Hertfordshire,County,Persons,70,,,2015/16,53.71098266,52.65879028,54.75988041,4646,8650,
+E10000016,Kent,County,Persons,70,,,2015/16,54.65371128,53.81853552,55.4862757,7481,13688,
+E10000017,Lancashire,County,Persons,70,,,2015/16,54.7510487,53.81795739,55.68081253,6004,10966,
+E10000018,Leicestershire,County,Persons,70,,,2015/16,62.88519637,61.71426791,64.04117945,4163,6620,
+E10000019,Lincolnshire,County,Persons,70,,,2015/16,56.4567508,55.3783191,57.52910759,4608,8162,
+E10000020,Norfolk,County,Persons,70,,,2015/16,55.02087453,53.99697443,56.04053835,5008,9102,
+E10000021,Northamptonshire,County,Persons,70,,,2015/16,50.47117074,49.23281587,51.70894778,3160,6261,
+E10000023,North Yorkshire,County,Persons,70,,,2015/16,60.73162836,59.50758404,61.94233519,3752,6178,
+E10000024,Nottinghamshire,County,Persons,70,,,2015/16,59.21128382,58.05094741,60.36144026,4114,6948,
+E10000025,Oxfordshire,County,Persons,70,,,2015/16,57.98057541,56.66581384,59.28410902,3164,5457,
+E10000027,Somerset,County,Persons,70,,,2015/16,57.46365105,56.22776755,58.69027655,3557,6190,
+E10000028,Staffordshire,County,Persons,70,,,2015/16,53.96611002,52.88199198,55.04648826,4395,8144,
+E10000029,Suffolk,County,Persons,70,,,2015/16,57.55107004,56.4795536,58.61553551,4733,8224,
+E10000030,Surrey,County,Persons,70,,,2015/16,52.4501992,51.47259558,53.42592857,5266,10040,
+E10000031,Warwickshire,County,Persons,70,,,2015/16,59.35603506,58.10046217,60.59949819,3521,5932,
+E10000032,West Sussex,County,Persons,70,,,2015/16,57.14767743,56.11617786,58.17300319,5081,8891,
+E10000034,Worcestershire,County,Persons,70,,,2015/16,58.48300192,57.25515505,59.70040395,3647,6236,
+E92000001,England,Country,Persons,70,,,2015/16,54.87830748,54.73403564,55.02249736,250936,457259,
+E47000001,CA-Greater Manchester,Combined authorities,Persons,70,,,2015/16,54.42218653,,,11519,21166,Aggregated from all known lower geography values
+E47000002,CA-Sheffield City Region,Combined authorities,Persons,70,,,2015/16,55.58107111,,,6777,12193,Aggregated from all known lower geography values
+E47000003,CA-West Yorkshire,Combined authorities,Persons,70,,,2015/16,55.68161568,,,9374,16835,Aggregated from all known lower geography values
+E47000004,CA-Liverpool City Region,Combined authorities,Persons,70,,,2015/16,54.5229145,,,6817,12503,Aggregated from all known lower geography values
+E47000005,CA-North East,Combined authorities,Persons,70,,,2015/16,57.89843328,,,10717,18510,Aggregated from all known lower geography values
+E47000006,CA-Tees Valley,Combined authorities,Persons,70,,,2015/16,54.55832891,,,3082,5649,Aggregated from all known lower geography values
+E47000007,CA-West Midlands,Combined authorities,Persons,70,,,2015/16,52.86576545,,,10598,20047,Aggregated from all known lower geography values
+E92000001,England,Country,Persons,70,County & UA deprivation deciles in England (IMD2010),Most deprived decile (IMD2010),2015/16,50.04063748,,,14161,28299,Aggregated from all known lower geography values
+E92000001,England,Country,Persons,70,County & UA deprivation deciles in England (IMD2010),Second most deprived decile (IMD2010),2015/16,49.42819766,,,11713,23697,Aggregated from all known lower geography values
+E92000001,England,Country,Persons,70,County & UA deprivation deciles in England (IMD2010),Third more deprived decile (IMD2010),2015/16,56.06391696,,,16420,29288,Aggregated from all known lower geography values
+E92000001,England,Country,Persons,70,County & UA deprivation deciles in England (IMD2010),Fourth more deprived decile (IMD2010),2015/16,54.37419146,,,20175,37104,Aggregated from all known lower geography values
+E92000001,England,Country,Persons,70,County & UA deprivation deciles in England (IMD2010),Fifth more deprived decile (IMD2010),2015/16,53.45801527,,,14006,26200,Aggregated from all known lower geography values
+E92000001,England,Country,Persons,70,County & UA deprivation deciles in England (IMD2010),Fifth less deprived decile (IMD2010),2015/16,53.17347195,,,25368,47708,Aggregated from all known lower geography values
+E92000001,England,Country,Persons,70,County & UA deprivation deciles in England (IMD2010),Fourth less deprived decile (IMD2010),2015/16,56.56413337,,,44262,78251,Aggregated from all known lower geography values
+E92000001,England,Country,Persons,70,County & UA deprivation deciles in England (IMD2010),Third less deprived decile (IMD2010),2015/16,56.02386302,,,28924,51628,Aggregated from all known lower geography values
+E92000001,England,Country,Persons,70,County & UA deprivation deciles in England (IMD2010),Second least deprived decile (IMD2010),2015/16,55.72597268,,,43527,78109,Aggregated from all known lower geography values
+E92000001,England,Country,Persons,70,County & UA deprivation deciles in England (IMD2010),Least deprived decile (IMD2010),2015/16,56.83194384,,,32380,56975,Aggregated from all known lower geography values
+E92000001,England,Country,Persons,70,County & UA deprivation deciles in England (IMD2015),Most deprived decile (IMD2015),2015/16,51.56385056,,,16107,31237,Aggregated from all known lower geography values
+E92000001,England,Country,Persons,70,County & UA deprivation deciles in England (IMD2015),Second most deprived decile (IMD2015),2015/16,50.98006506,,,12224,23978,Aggregated from all known lower geography values
+E92000001,England,Country,Persons,70,County & UA deprivation deciles in England (IMD2015),Third more deprived decile (IMD2015),2015/16,54.28593774,,,13882,25572,Aggregated from all known lower geography values
+E92000001,England,Country,Persons,70,County & UA deprivation deciles in England (IMD2015),Fourth more deprived decile (IMD2015),2015/16,54.71428571,,,22214,40600,Aggregated from all known lower geography values
+E92000001,England,Country,Persons,70,County & UA deprivation deciles in England (IMD2015),Fifth more deprived decile (IMD2015),2015/16,50.6374052,,,15690,30985,Aggregated from all known lower geography values
+E92000001,England,Country,Persons,70,County & UA deprivation deciles in England (IMD2015),Fifth less deprived decile (IMD2015),2015/16,54.87135281,,,29281,53363,Aggregated from all known lower geography values
+E92000001,England,Country,Persons,70,County & UA deprivation deciles in England (IMD2015),Fourth less deprived decile (IMD2015),2015/16,56.4685893,,,37555,66506,Aggregated from all known lower geography values
+E92000001,England,Country,Persons,70,County & UA deprivation deciles in England (IMD2015),Third less deprived decile (IMD2015),2015/16,54.51923943,,,36300,66582,Aggregated from all known lower geography values
+E92000001,England,Country,Persons,70,County & UA deprivation deciles in England (IMD2015),Second least deprived decile (IMD2015),2015/16,57.94564055,,,36307,62657,Aggregated from all known lower geography values
+E92000001,England,Country,Persons,70,County & UA deprivation deciles in England (IMD2015),Least deprived decile (IMD2015),2015/16,56.25056025,,,31376,55779,Aggregated from all known lower geography values
