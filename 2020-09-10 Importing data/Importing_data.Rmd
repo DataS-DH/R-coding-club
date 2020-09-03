@@ -1,8 +1,8 @@
 ---
-title: 'Importing data'
+title: 'Importing data from published sources '
 author: "Martine Wauben"
-institute: "DHSC"
-date: "2020-03-05 (updated: `r Sys.Date()`)"
+institute: "DHSC Data Science Hub"
+date: "2020-09-10 (updated: `r Sys.Date()`)"
 css: my-theme.css
 output:
   xaringan::moon_reader:
@@ -31,7 +31,7 @@ class: inverse
 
 # Session overview
 
-* What is data?
+* What is (tidy) data?
 * Importing .csv
 * Importing .xls
 * Cleaning .xls
@@ -39,6 +39,16 @@ class: inverse
 * Importing .zip
 * Handling common data problems
 * Why bother
+
+--
+
+## By the end, you will know how to use...
+
+* `readr` for reading CSV's
+* `readxl` for reading XLS/XLSX
+* `downloader` for downloading XLS(X) and ZIP
+* `unzip` for handling ZIP
+* `janitor` for cleaning
 
 ---
 
@@ -58,7 +68,18 @@ However, this still **does not mean it has to start off tidy and tabular**!
 ]
 
 ---
+# What is tidy data?
 
+![](https://d33wubrfki0l68.cloudfront.net/6f1ddb544fc5c69a2478e444ab8112fb0eea23f8/91adc/images/tidy-1.png)
+
+1. Each variable must have its own column.
+2. Each observation must have its own row.
+3. Each value must have its own cell.
+
+
+> “Tidy datasets are all alike, but every messy dataset is messy in its own way." - Hadley Wickham
+
+---
 # What is data at DHSC?
 
 * NHS Digital
@@ -73,6 +94,33 @@ However, this still **does not mean it has to start off tidy and tabular**!
 Usually looking roughly like this...
 
 .center[<img src='https://i.imgur.com/pT3S8ij.png' height = '300px' width = '700px'>]
+
+---
+
+class: inverse
+
+# Handling different types of file
+
+--
+
+**For R beginners:**
+
+**Functions** describe calculations you apply to to a dataset, like rolling averages or regressions. They take input, often including the data you want to apply the function to and any additional parameters (like 'how big is the rolling window').
+
+**Packages** are bundles of functions that work well together. You have to install a package to allow you to use all the functions inside it.
+
+
+```{r beginners, eval = FALSE}
+install.packages('packagename')
+data_out <- packagename::functionname(data_in, parameter_in = 5)
+```
+
+Later on, you can refer to `data_out` as if it was a spreadsheet, and apply new functions to columns inside it. 
+
+```{r beginner col, eval = FALSE}
+avg_value <- mean(data_out$variable)
+```
+
 
 ---
 
@@ -107,7 +155,7 @@ xls_data <- readxl::read_excel('xls_data.xls',
 
 .pull-left[
 
-Not 'tidy' in the R sense of the word!
+Very human-friendly, but not 'tidy' in the R sense of the word!
 
 ![](https://media0.giphy.com/media/g79am6uuZJKSc/source.gif)
 ]
@@ -250,6 +298,13 @@ unzip('seven_day_service.zip') #<<
 
 ---
 
+class: inverse
+
+# What if my data still doesn't cooperate?
+
+
+---
+
 # Handling common data problems
 
 * **Not the right number of columns?**
@@ -338,7 +393,8 @@ sevenday_data <- readxl::read_excel('Seven-day Services length of stay indicator
 
 ```{r example xlsx skip, message = FALSE, results = FALSE}
 sevenday_data <- readxl::read_excel('Seven-day Services length of stay indicator, Oct17-Sep18 (xlsx).xlsx', 
-                                    sheet = 2, skip = 15)
+                                    sheet = 2, 
+                                    skip = 15) #<<
 ```
 
 
