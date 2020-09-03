@@ -1,0 +1,240 @@
+---
+title: "Understanding and using R functions"
+output:
+  html_document: default
+  pdf_document: default
+---
+Andreas Soteriades
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, eval = FALSE}
+install.packages("tidyverse")
+```
+
+```{r echo = TRUE, include = FALSE}
+library(tidyverse)
+```
+
+## What is a R function?
+The definition of a R function is no different from the standard definition of a function: a process that converts one or more arguments into an output:
+
+```{r, echo = TRUE}
+x <- -(1:10)
+x
+mean(x)
+mean(abs(x))
+```
+
+Pretty much everything you do in R involves functions. Many of them are available by default when you install R (e.g. `mean()`, `plot()`, `lm()`, `View()`). 
+
+The rest of them are available in R packages. An R package is a collection of functions that have been developed to serve a particular purpose. For example, package `dplyr` was developed to ease the manipulation of datasets, and it has it's own suite of functions for selecting (`select()`), mutating (`mutate()`) and ordering (`arrange()`) data, among others. 
+
+Another example is package `ggplot`, with its suite of functions for creating all sorts of plots: scatter plots (`geom_point()`), box plots (`geom_boxplot()`), bar plots (`geom_col()`) etc.
+
+There are an awful lot R packages out there. But they don't serve all pusposes and needs. That's where creating your own functions can make coding so much easier and efficient.
+
+## Our first tailor-made function
+Consider the `iris` dataset:
+
+```{r, echo = TRUE}
+as_tibble(iris)
+levels(iris$Species)
+```
+
+Say you want to plot the `iris` data for each of the three species above. You can do this the hard way, i.e. manually:
+
+First for setosa:
+
+```{r, echo = TRUE}
+iris %>%
+  filter(Species == 'setosa') %>% # Hard-code the species you'd like to plot data for here
+  select(-Species, Sepal.Length, Sepal.Width) %>%
+  ggplot(aes(Sepal.Length, Sepal.Width)) + 
+  geom_point()
+```
+
+Then for versicolor:
+
+```{r, echo = TRUE}
+iris %>%
+  filter(Species == 'versicolor') %>% # Hard-code the species you'd like to plot data for here
+  select(-Species, Sepal.Length, Sepal.Width) %>%
+  ggplot(aes(Sepal.Length, Sepal.Width)) + 
+  geom_point()
+```
+
+And then for virginica... what a _pain_- I think you see where I'm going!
+
+Or you can do the above with your _own function_:
+
+```{r, echo = TRUE}
+plot_iris_data <- function(data, species) {
+ data %>%
+  filter(Species == species) %>% # Variable "species" represents any of the iris plants
+  select(-Species, Sepal.Length, Sepal.Width) %>%
+  ggplot(aes(Sepal.Length, Sepal.Width)) + 
+  geom_point() 
+}
+```
+
+Our function in action, for setosa:
+
+```{r, echo = TRUE}
+plot_iris_data(data = iris, species = 'setosa')
+```
+
+You can now automate it for all species:
+
+```{r, echo = TRUE}
+for (i in levels(iris$Species)) {
+  plot_iris_data(data = iris, species = i)
+}
+```
+
+_"So what? I can always automate the initial script, can't I?"_
+
+```{r, echo = TRUE}
+for (i in levels(iris$Species)) {
+  iris %>%
+  filter(Species == i) %>%
+  select(-Species, Sepal.Length, Sepal.Width) %>%
+  ggplot(aes(Sepal.Length, Sepal.Width)) + 
+  geom_point()
+}
+```
+
+The answer is yes- but note how much shorter, tidier and neater the script is with the function `plot_iris_data()`. We've replaced five lines of code with one, and the only thing we need to do is call the function anywhere in the script, rather than copy and paste the initial script again and again.
+
+## Taking it further: using our function with _any_ dataset
+We can extend the applicability of `plot_iris_data()` by making it possible to plot different datasets.
+
+Let's then forget `plot_iris_data()` and create a new function. Except for being able to plot different datasets, the new function will also plot all of the above scatterplots (for the three species) into one:
+
+```{r, echo = TRUE}
+plot_any_data <- function(data, x, y, category) {
+  data %>%
+    select(all_of(c(x, y, category))) %>% # all_of() ensures that dplyr understands that character vectors x, y and category refer to column names
+    rename(x = all_of(x), y = all_of(y), category = all_of(category)) %>%
+    mutate(category = factor(category)) %>% # We want category to be a factor so that the colour and shape aesthetics below work properly.
+    ggplot(aes(x, y, colour = category, shape = category)) + 
+    geom_point() + 
+    xlab(x) + 
+    ylab(y) + 
+    labs(
+      colour = category,
+      shape = category
+    )
+}
+```
+
+For one thing, we can try it on the `iris` data:
+
+```{r, echo = TRUE}
+plot_any_data(data = iris, x = 'Sepal.Length', y = 'Sepal.Width', category = 'Species')
+```
+
+But we can also use it with _any_ dataset, e.g. `mtcars`:
+
+```{r, echo = TRUE}
+as_tibble(mtcars)
+
+plot_any_data(data = mtcars, x = 'mpg', y = 'disp', category = 'cyl')
+```
+
+The true advantage here is that we have created a `plot_any_data()` function that suits our particular needs. You may want to extend the function to ensure that the plots it produces follow a certain style in terms of point colours and shapes, background (e.g. blank, grids/no grids), text size etc. The possibilities are numerous and under your complete control.
+
+## The `...` argument
+
+You may have noticed that many R functions have `...` as an argument. If you look at the help page of a function that has a `...` argument (e.g. type `?mean` on the command line and scroll down to the last line of the "Arguments" section), this argument is normally described as something along these lines: "Further arguments passed to or from other methods."
+
+What does this mean? And why is it useful?
+
+Suppose we want to create a function that contains another function. Let's call the former function `func_outer()` and let's suppose that the latter function is R's `mean()`. When we use `...` in `func_outer()`, it's like telling it that, on top of any other arguments that we may want it to have, we'll also be passing arguments that concern function `mean()`.
+
+An illuminating demonstration:
+```{r, echo = TRUE}
+# Define a useless func_outer() for the sake of the example
+func_outer <- function(x) {
+  x <- x ^ 2
+  mean(x)
+}
+
+# Try the function with a numeric vector
+x <- iris$Sepal.Length
+func_outer(x)
+
+# Now, let's assume our data have NA values
+x[1:10] <- NA
+func_outer(x)
+```
+
+What has happened? By default, mean() returns NA when NAs are present in the data. We can control this by setting its `na.rm` argument to `TRUE` (`na.rm` takes a logical value indicating whether records with NA values should be ignored before the mean is calculated. ). But `mean()` is inside `func_outer()`. How can we pass the `na.rm` argument into `mean()` through `func_outer()`? That's where `...` comes into play:
+
+```{r, echo = TRUE}
+# Add "..." as an argument of func_outer()
+func_outer <- function(x, ...) {
+  x <- x ^ 2
+  mean(x, ...) # Also type "..." here
+}
+
+x <- iris$Sepal.Length
+x[1:10] <- NA
+func_outer(x, na.rm = TRUE)
+```
+
+Voila! It's as if we told `func_outer()` "I'll be passing you a few arguments that you won't recognise. But don't worry- these are arguments that concern the function that's inside you. So, when you see `na.rm = TRUE`, don't wonder what it is- just pass it directly to `mean()`."
+
+## Hints & Tips
+- It's good practice to define function names in lowercase and using "_" as a separator between words. For example: `my_first_function()` instead of `My.First.Function()` or `MyFirstFunction()`.
+- Try not to use cryptic names. There's nothing stopping you from using a long name to describe what the function is about. This is particularly handy when your functions serve a very specific and specialized purpose. For instance: `load_data_from_sql_server()` instead of `load_data()`.
+- It's often handy to save your R functions as R files and call them in different scripts. When you do that, make sure that the R file name matches the function name. For example the R file name for `my_first_function()` should be `my_first_function.R` You can call this function in your script with `source("my_first_function.R")`.
+- The best way of keeping track and control of your tailor-made functions is to create a folder (e.g. "My R functions") and have all R files in there. Doing so is also less tedious in terms of coding, because it's much easier to type this:
+
+```
+source("My R functions//function_a.R")
+source("My R functions//function_b.R")
+```
+
+than this:
+
+```
+source("Folder where function A is//function_a.R")
+source("Folder where function B is//function_b.R")
+```
+
+- A strong advantage of creating R functions and calling them into your script is that it can make error handling and debuging so much easier. If you have a massive script and an error occurs, it's often very difficult to detect the problem. By contrast, if the error occurs on the line where you are using a function that you've called, you know that the issue lies within the function. You can then go to the function's R file and investigate further in there.
+
+## Exercises
+**Exercise 1**
+
+Create a function that:
+
+1. Scales a numeric vector (use function `scale()`)
+2. If the value in the scaled data is positive, then it is replaced by `NA`
+3. Calculates the median (use function `median()`)
+
+Then, try the function with the following numeric vector:
+
+```{r}
+vec <- iris$Sepal.Length
+```
+
+Do you suspect what the result will be? What can we do to fix it?
+
+**Exercise 2**
+
+Consider the numeric vector from Exercise 1:
+
+```{r}
+vec <- iris$Sepal.Length
+```
+
+Create a function that:
+
+1. Does 1-3 as in Exercise 1
+2. Tells `median()` to ignore `NA`s
+
+Try the function with the vector defined in Exercise 1.
