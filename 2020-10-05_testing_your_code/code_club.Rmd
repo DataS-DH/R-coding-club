@@ -1,0 +1,254 @@
+---
+title: "R Code Club: Testing Code"
+output: html_notebook
+---
+
+Two types of tests:  
+1. Unit Tests - used in development to check that you haven't made any mistakes  
+2. Run time tests - used at run time to check that the user hasn't made a mistake while running your code
+
+Goal is to halt proceedings if something wrong occurs rather than go through potentially expensive processing.  So we need to be able to catch issues
+
+
+```{r}
+knitr::opts_chunk$set(chace=T, warning = F, message = F, echo = T, fig.width = 8, fig.height = 5)
+```
+
+
+## Basic function 1
+```{r}
+taking_log <- function(x) {
+    return (log(x))
+}
+```
+
+### Running some tests 1
+```{r}
+taking_log(100)
+```
+```{r}
+taking_log("x")
+```
+
+Back to the drawing board.... Need to include some checks
+
+## Basic function 2
+```{r}
+taking_log_part2 <- function(x) {
+    if (is.numeric(x)) return (log(x))
+    return("Cant take log")
+}
+```
+
+### Running some tests 2
+```{r}
+taking_log_part2(100)
+```
+```{r}
+taking_log_part2("x")
+```
+
+These work fine. Great!
+
+## More tests ....
+```{r}
+taking_log_part2(-15)
+```
+
+Need to build in more tests
+
+```{r}
+taking_log_part3 <- function(x) {
+    if (is.numeric(x) & x > 0 ) return (log(x))
+    return("Cant take log")
+}
+```
+
+## Tests now look like ..
+```{r}
+taking_log_part3(100)
+taking_log_part3("x")
+taking_log_part3(-15)
+```
+
+What about complex numbers ?
+
+```{r}
+taking_log_part3(6+5i)
+```
+
+or vectors 
+
+```{r}
+x <- taking_log_part3(c(1,-2))
+x
+```
+Only the first element is checked -> we'd need to loop through each element or use purrr
+
+
+And on it goes
+
+
+## Assertive
+
+```{r}
+library(assertive)
+library(magrittr)
+```
+
+
+```{r}
+assert_is_numeric(15)
+```
+
+If passes assert, returns the value
+```{r}
+x <- 15 %>% 
+    assert_is_numeric()
+x
+```
+
+```{r}
+x <- 15 %>% 
+    assert_is_numeric() %>% 
+    assert_all_are_greater_than(0)
+x
+```
+
+Works easily with vectors
+```{r}
+x <- c(15,3) %>% 
+    assert_is_numeric() %>% 
+    assert_all_are_greater_than(0)
+x
+```
+
+Otherwise crashes
+```{r}
+x <- c(15,-3) %>% 
+    assert_is_numeric() %>% 
+    assert_all_are_greater_than(0)
+x
+```
+```{r}
+x <- c(6+5i) %>% 
+    assert_is_numeric() %>% 
+    assert_all_are_greater_than(0)
+x
+```
+
+
+
+## Assertive with Try/Catch  
+We dont want to crash our code intentionally.  What do we do?
+
+
+```{r}
+taking_log_part5 <- function(x) {
+    tryCatch(
+        x %>% 
+            assert_is_numeric() %>% 
+            assert_all_are_greater_than(0) %>% 
+            assert_is_double() %>% 
+            log(),
+        error=function(e){
+            print(e)
+            NA
+        }
+    )
+}
+```
+
+```{r}
+x <- taking_log_part5(100)
+x
+```
+
+```{r}
+x <- taking_log_part5("x")
+x
+```
+
+
+```{r}
+x <- taking_log_part5(-15)
+x
+```
+
+
+
+```{r}
+x <- taking_log_part5(6+5i)
+x
+```
+
+
+
+```{r}
+x <- taking_log_part5(c(100, 1000))
+x
+```
+
+```{r}
+x <- taking_log_part5(c(100, -15))
+x
+```
+
+
+```{r}
+x <- taking_log_part5(c(100, "x"))
+x
+```
+
+
+# With dataframes
+We can make use of the assert package functions, to check our data ....
+
+```{r}
+x <- data.frame("A"=c(1,2,3,4,5,5), "B"=c("a", "b", "c", "d", "e", "e"))
+
+a <- x %>% 
+    has_duplicates()
+a
+```
+
+[Assertive documentation](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&cad=rja&uact=8&ved=2ahUKEwiakaSVsJDrAhUOQxUIHQOzDwIQFjACegQIAxAB&url=https%3A%2F%2Fwww.rdocumentation.org%2Fpackages%2Fassertive%2Fversions%2F0.3-6&usg=AOvVaw0zjrQLzY6TucaB4_KXMqNB)
+
+
+## Exercise
+Write a function using assertive package to calculate Geometric Mean
+$$\hat{x} = \sqrt[\leftroot{-3}\uproot{3} n ]{\prod_{i=1}^{n} x_i } $$
+
+```{r}
+geometric_mean <- function(x, na.rm=FALSE){
+    return( exp(mean(log(x), na.rm=na.rm)) )
+}
+```
+
+
+
+
+## A solution
+
+```{r}
+geometric_mean <- function(x, na.rm=FALSE){
+    tryCatch(
+        x %>% 
+            assert_is_numeric() %>% 
+            assert_all_are_greater_than(0) %>% 
+            assert_is_double() %>% 
+            log() %>% 
+            mean(na.rm=na.rm) %>% 
+            exp(),
+        error=function(e){
+            print("x makes no sense")
+            NA
+        }
+    )
+}
+```
+
+geometric_mean(c(1,1))
+geometric_mean(c(2,2))
+geometric_mean(c(2,x))
+
