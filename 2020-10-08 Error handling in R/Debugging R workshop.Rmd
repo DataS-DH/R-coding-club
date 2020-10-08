@@ -69,6 +69,8 @@ knitr::kable(vaccine_coverage_region, row.names = FALSE)
 
 Syntax errors, such as missing commas or brackets, can often produce strange error messages, so if you're confused it's always worth double checking these.
 
+Note: We used 'colnames(...)' above to view the column names of a data frame, but a useful way of viewing all of the details of a data frame within RStudio is the 'View(...)' function. This will give you a spreadsheet-like view of the data frame's contents.
+
 ### Tracking down more complicated errors - traceback()
 
 Sometimes, it might not be immediately clear which part of the code has caused an error message.
@@ -160,6 +162,12 @@ vaccine_change_region <- compute_change_table(vaccine_coverage_region, "Area.Nam
 knitr::kable(vaccine_change_region)
 ```
 
+It is possible to have RStudio enter browser mode by default whenever an error occurs. To turn this option on, go to 'Debug -> On Error' and then select 'Break in Code'.
+
+<img src='debug_options.png'>
+
+If you select this option, browser will only be triggered when an error has occurred in a piece of code you have written. To automatically enter browser for all errors, go to Tools -> Global Options, and untick "Use debug handler only when my code contains errors".
+
 ### Creating errors with stop()
 
 We are now using the function correctly, but maybe we are still worried. What if other users of the function make the same mistake in future? No error message was generated, so there is a risk that the user will not notice that anything has gone wrong. We would prefer it if an error message were generated in this case, and the execution stopped, to guarantee that people do not end up trusting a bad output.
@@ -202,8 +210,8 @@ vaccine_coverage_tables = list()
 for (file in list.files("./data")) {
   vaccine_coverage_tables[[file]] <- read.csv(paste0("data/", file)) %>%
     dplyr::filter(Area.Type == "Region") %>%
-  dplyr::select(Area.Code, Area.Name, Time.period, Value) %>%
-  dplyr::arrange(Area.Code)
+    dplyr::select(Area.Code, Area.Name, Time.period, Value) %>%
+    dplyr::arrange(Area.Code)
 }
 ```
 
@@ -222,8 +230,8 @@ for (file in list.files("./data")) {
   try(
     vaccine_coverage_tables[[file]] <- read.csv(paste0("data/", file)) %>%
       dplyr::filter(Area.Type == "Region") %>%
-    dplyr::select(Area.Code, Area.Name, Time.period, Value) %>%
-    dplyr::arrange(Area.Code)
+      dplyr::select(Area.Code, Area.Name, Time.period, Value) %>%
+      dplyr::arrange(Area.Code)
   )
 }
 
@@ -241,8 +249,8 @@ for (file in list.files("./data")) {
   tryCatch(
     vaccine_coverage_tables[[file]] <- read.csv(paste0("data/", file)) %>%
       dplyr::filter(Area.Type == "Region") %>%
-    dplyr::select(Area.Code, Area.Name, Time.period, Value) %>%
-    dplyr::arrange(Area.Code),
+      dplyr::select(Area.Code, Area.Name, Time.period, Value) %>%
+      dplyr::arrange(Area.Code),
     error = function(e) {print(paste("There was a problem with the formatting of", file, e))}
   )
 }
@@ -251,3 +259,9 @@ print(length(vaccine_coverage_tables))
 ```
 
 This allows us to write our own error message. The 'error' argument in tryCatch should be a function, which will be executed if an error occurs. The argument to this function ('e') is the error message produced by R. In this example, when an error occurs, we print our own custom error message specifying which file had a problem, and then append the error message produced by R onto the end. If the data folder contained a large number of files, this error handling would hopefully be a lot more helpful than R's default.
+
+Note: the purrr package contains alternative error-handling functions: 'safely', 'quietly', and 'possibly'.
+
+### Acknowledgements
+
+Thank you to Matthew Katz and James Riley for suggesting additions to this workshop after it was first delivered on 2020/10/08.
