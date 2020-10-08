@@ -882,6 +882,10 @@ for (file in list.files(&quot;./data&quot;)) {
 <p>This allows us to write our own error message. The ‘error’ argument in tryCatch should be a function, which will be executed if an error occurs. The argument to this function (‘e’) is the error message produced by R. In this example, when an error occurs, we print our own custom error message specifying which file had a problem, and then append the error message produced by R onto the end. If the data folder contained a large number of files, this error handling would hopefully be a lot more helpful than R’s default.</p>
 <p>Note: the purrr package contains alternative error-handling functions: ‘safely’, ‘quietly’, and ‘possibly’.</p>
 </div>
+<div id="acknowledgements" class="section level3">
+<h3>Acknowledgements</h3>
+<p>Thank you to Matthew Katz and James Riley for suggesting additions to this workshop after it was first delivered on 2020/10/08.</p>
+</div>
 
 
 
