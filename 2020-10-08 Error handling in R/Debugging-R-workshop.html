@@ -838,8 +838,8 @@ vaccine_change_region &lt;- compute_change_table(vaccine_coverage_region, &quot;
 for (file in list.files(&quot;./data&quot;)) {
   vaccine_coverage_tables[[file]] &lt;- read.csv(paste0(&quot;data/&quot;, file)) %&gt;%
     dplyr::filter(Area.Type == &quot;Region&quot;) %&gt;%
-  dplyr::select(Area.Code, Area.Name, Time.period, Value) %&gt;%
-  dplyr::arrange(Area.Code)
+    dplyr::select(Area.Code, Area.Name, Time.period, Value) %&gt;%
+    dplyr::arrange(Area.Code)
 }</code></pre>
 <pre><code>## Error: Problem with `filter()` input `..1`.
 ## x object &#39;Area.Type&#39; not found
@@ -854,8 +854,8 @@ for (file in list.files(&quot;./data&quot;)) {
   try(
     vaccine_coverage_tables[[file]] &lt;- read.csv(paste0(&quot;data/&quot;, file)) %&gt;%
       dplyr::filter(Area.Type == &quot;Region&quot;) %&gt;%
-    dplyr::select(Area.Code, Area.Name, Time.period, Value) %&gt;%
-    dplyr::arrange(Area.Code)
+      dplyr::select(Area.Code, Area.Name, Time.period, Value) %&gt;%
+      dplyr::arrange(Area.Code)
   )
 }</code></pre>
 <pre><code>## Error : Problem with `filter()` input `..1`.
@@ -871,8 +871,8 @@ for (file in list.files(&quot;./data&quot;)) {
   tryCatch(
     vaccine_coverage_tables[[file]] &lt;- read.csv(paste0(&quot;data/&quot;, file)) %&gt;%
       dplyr::filter(Area.Type == &quot;Region&quot;) %&gt;%
-    dplyr::select(Area.Code, Area.Name, Time.period, Value) %&gt;%
-    dplyr::arrange(Area.Code),
+      dplyr::select(Area.Code, Area.Name, Time.period, Value) %&gt;%
+      dplyr::arrange(Area.Code),
     error = function(e) {print(paste(&quot;There was a problem with the formatting of&quot;, file, e))}
   )
 }</code></pre>

@@ -210,8 +210,8 @@ vaccine_coverage_tables = list()
 for (file in list.files("./data")) {
   vaccine_coverage_tables[[file]] <- read.csv(paste0("data/", file)) %>%
     dplyr::filter(Area.Type == "Region") %>%
-  dplyr::select(Area.Code, Area.Name, Time.period, Value) %>%
-  dplyr::arrange(Area.Code)
+    dplyr::select(Area.Code, Area.Name, Time.period, Value) %>%
+    dplyr::arrange(Area.Code)
 }
 ```
 
@@ -230,8 +230,8 @@ for (file in list.files("./data")) {
   try(
     vaccine_coverage_tables[[file]] <- read.csv(paste0("data/", file)) %>%
       dplyr::filter(Area.Type == "Region") %>%
-    dplyr::select(Area.Code, Area.Name, Time.period, Value) %>%
-    dplyr::arrange(Area.Code)
+      dplyr::select(Area.Code, Area.Name, Time.period, Value) %>%
+      dplyr::arrange(Area.Code)
   )
 }
 
@@ -249,8 +249,8 @@ for (file in list.files("./data")) {
   tryCatch(
     vaccine_coverage_tables[[file]] <- read.csv(paste0("data/", file)) %>%
       dplyr::filter(Area.Type == "Region") %>%
-    dplyr::select(Area.Code, Area.Name, Time.period, Value) %>%
-    dplyr::arrange(Area.Code),
+      dplyr::select(Area.Code, Area.Name, Time.period, Value) %>%
+      dplyr::arrange(Area.Code),
     error = function(e) {print(paste("There was a problem with the formatting of", file, e))}
   )
 }
