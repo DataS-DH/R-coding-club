@@ -69,6 +69,8 @@ knitr::kable(vaccine_coverage_region, row.names = FALSE)
 
 Syntax errors, such as missing commas or brackets, can often produce strange error messages, so if you're confused it's always worth double checking these.
 
+Note: We used 'colnames(...)' above to view the column names of a data frame, but a useful way of viewing all of the details of a data frame within RStudio is the 'View(...)' function. This will give you a spreadsheet-like view of the data frame's contents.
+
 ### Tracking down more complicated errors - traceback()
 
 Sometimes, it might not be immediately clear which part of the code has caused an error message.
