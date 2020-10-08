@@ -162,6 +162,12 @@ vaccine_change_region <- compute_change_table(vaccine_coverage_region, "Area.Nam
 knitr::kable(vaccine_change_region)
 ```
 
+It is possible to have RStudio enter browser mode by default whenever an error occurs. To turn this option on, go to 'Debug -> On Error' and then select 'Break in Code'.
+
+<img src='debug_options.png'>
+
+If you select this option, browser will only be triggered when an error has occurred in a piece of code you have written. To automatically enter browser for all errors, go to Tools -> Global Options, and untick "Use debug handler only when my code contains errors".
+
 ### Creating errors with stop()
 
 We are now using the function correctly, but maybe we are still worried. What if other users of the function make the same mistake in future? No error message was generated, so there is a risk that the user will not notice that anything has gone wrong. We would prefer it if an error message were generated in this case, and the execution stopped, to guarantee that people do not end up trusting a bad output.
