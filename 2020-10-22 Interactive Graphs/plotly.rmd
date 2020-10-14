@@ -1,0 +1,183 @@
+---
+title: 'Interactive graphs with Plotly'
+author: "James Riley"
+institute: "DHSC"
+date: "2020-10-22"
+output: slidy_presentation
+---
+  
+  
+```{r setup, include = FALSE, warning=FALSE, message=FALSE}
+
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE
+)
+library("tidyverse")
+library("knitr")
+library("magrittr")
+library("downloader")
+library("plotly")
+
+```
+
+
+## Overview
+
+
+<iframe src="https://plotly.com/r/" width="100%" height="100%"></iframe>
+
+
+
+## Required Packages
+
+See requirements.R in the same folder as the slides. 
+
+I've taken [Baby names in England & Wales 1996-2019](https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths/datasets/babynamesinenglandandwalesfrom1996) as a working dataset. I've tidied that data since we looked at data importing earlier.
+
+I've been entirely egotistical and used "James" as an example - grab the code for this presentation and change it to your/your kids' names.
+
+I'll generate one or two other datasets on-the-fly.
+
+```{r}
+names <- read_csv(here::here("2020-10-22 Interactive Graphs/data/babynames.csv")) %>%
+  select(year, gender, Name, count)
+```
+
+## Exploring data
+
+Traditionally:
+
+```{r}
+sine <- tibble(t = seq(0, 3, length.out = 10000),
+               y = sin(880 * t))
+
+sine %>%
+  ggplot(aes(x = t, y = y)) + geom_line()
+```
+
+Erm... change the scale? Try new numbers wait...
+
+
+
+## With Plotly
+
+```{r}
+sine %>%
+  plot_ly(x = ~t, y = ~y) %>%
+  add_lines()
+```
+
+
+## Shortcut
+
+If you're already familiar with ggplot, there's a conversion function that usually works:
+
+```{r}
+g <- names %>%
+  filter(Name == "JAMES", gender == "Boys") %>%
+  ggplot(aes(x = year, y = count)) + geom_line() + theme_minimal()
+
+ggplotly(g)
+```
+
+
+But it's not usually pretty...
+
+
+
+---
+
+
+
+Plotly is usually happier when we don't go via ggplot. Which does mean learning a new syntax:
+
+```{r}
+names %>%
+  filter(Name == "JAMES", gender == "Boys") %>%
+  plot_ly(x = ~year, y = ~count) %>%
+    add_lines()
+```
+
+
+
+
+---
+
+That makes it look like Jameses are declining to 0/year, so we can reset the y-axis:
+
+```{r}
+names %>%
+  filter(Name == "JAMES", gender == "Boys") %>%
+  plot_ly(x = ~year, y = ~count) %>%
+    add_lines() %>%
+    layout(
+      yaxis = list(rangemode = "tozero")
+    )
+
+```
+
+
+---
+
+We can map variables to plot aesthetics, like in ggplot:
+
+```{r}
+names %>%
+  filter(Name == "ALEX") %>%
+  plot_ly(x = ~year, y = ~count, color = ~gender) %>%
+  add_lines()
+
+```
+
+---
+
+It's not been _very_ interactive yet. Let's animate, looking at top 10 girls/boys names by year.
+
+```{r}
+names %>%
+  filter(gender == "Girls") %>%
+  group_by(year) %>%
+  slice_max(count, n = 10) %>%
+  arrange(desc(count)) %>%
+  plot_ly(x = ~Name, y = ~count, frame = ~year) %>%
+    add_bars() %>%
+    animation_opts(redraw = TRUE, frame = 1000, transition = 0)
+```
+
+
+---
+
+```{r}
+names %>%
+  filter(gender == "Boys") %>%
+  group_by(year) %>%
+  slice_max(count, n = 10) %>%
+  arrange(desc(count)) %>%
+  plot_ly(x = ~Name, y = ~count, frame = ~year) %>%
+    add_bars() %>%
+    animation_opts(redraw = TRUE, frame = 1000, transition = 0)
+
+```
+
+
+---
+
+You *can* make 3D graphs. You rarely *should*:
+
+```{r}
+top_10 <- names %>%
+  group_by(gender, Name) %>%
+  summarise(total = sum(count)) %>%
+  ungroup() %>%
+  slice_max(total, n = 10)
+
+```
+
+```{r}
+names %>%
+  filter(Name %in% top_10$Name) %>%
+  plot_ly(x = ~year, y = ~Name, z = ~count) %>%
+  add_markers()
+```
