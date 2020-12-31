@@ -38,30 +38,35 @@ print(ons_out)
 
 ## Creating a database
 
-We could create a database and add this data to a database, or we could create the database in memory using the `":memory:"` instead of the database name
+SQL stands for "Structured Query Language", and it is designed for querying tables of data stored in databases.
+
+Typically, the database is stored in a remote server somewhere. You connect to the server, via a programming language like R or python, or through specialised software like SQL Server Management Studio. You then send a query to the server in the form of a SQL statement, and the server sends back the data you asked for.
+
+For this workshop, the database will be stored in a file on our local machine instead. The R code below creates this database, called my-sqlite-db.sqlite, and adds the above table to it:
+
 ```{r}
 mydb <- DBI::dbConnect(RSQLite::SQLite(), "my-sqlite-db.sqlite")
 
 DBI::dbWriteTable(mydb, "ons_out", ons_out, overwrite=T)
 ```
+
 **Note**, the my-sqlite-db.sqlite appears in my folder.  
+
 If I wanted to add data to an existing table I would replace the `overwrite=T` with `append=T`
 
 I can also list the tables in my database - I find this useful as I forget the names
 ```{r}
-dbListTables(mydb)
+DBI::dbListTables(mydb)
 ```
 
 Also, when you finish with a database you need to disconnect
 ```{r}
-# dbDisconnect(mydb)
+# DBI::dbDisconnect(mydb)
 ```
 
-
+We've used the DBI package in R here to create the database. You can also use functions from this package to connect to databases, and execute SQL queries, as we'll see below. But the focus of this workshop is on SQL itself, rather than using it inside R. Whether you're using R, python, or writing queries directly in database software, the syntax of the SQL queries will usually remain the same.
 
 We'll now review how to select the data we want from this table, using 'SELECT' queries.
-
-In this workshop we use the sqldf package in R. This lets us query tables in R using SQL queries, as if they were tables in SQL databases.
 
 
 ## Selecting columns
@@ -263,37 +268,6 @@ A RIGHT JOIN is the opposite of a LEFT JOIN. All rows in the right hand table ar
 
 All rows in both tables are included.
 
-
-### UNION
-This is the sql equivalent of rbind.  I'll just split the data into two tables, add them to the database and then UNION them to get the original table
-```{r}
-table1 <- dbGetQuery(mydb, "SELECT * FROM my_table WHERE rowid  <= 214") 
-dbWriteTable(mydb, "Table1", table1, overwrite=T)
-
-table2 <- dbGetQuery(mydb, "SELECT * FROM my_table WHERE rowid  > 214") 
-dbWriteTable(mydb, "Table2", table2, overwrite=T)
-```
-
-These tables now appear in the database
-```{r}
-dbListTables(mydb)
-```
-
-
-```{r}
-table3 <- dbGetQuery(mydb, 
-"SELECT * FROM Table1 
-UNION ALL
-SELECT * FROM Table2")
-```
-
-```{r}
-dim(table3)
-```
-
-
-
-
 ## Applying operations over multiple rows
 
 We have already seen how to perform row by row operations, when we computed a new column containing the proportion of the population who are under 18. But what if we want to perform some operation involving multiple rows? SQL has several inbuilt functions which allow us to do this.
@@ -358,6 +332,36 @@ ORDER BY prop_below_18 desc
 
 Note that metropolitan districts are clearly contained within metropolitan counties, and the life expectancy for females will be slightly off because we used total population instead of population of 65 year olds to weight the average.
 
+### UNION
+
+UNION lets you combine the rows from two separate tables into one larger table (the equivalent of rbind in R).  I'll just split the data into two tables, add them to the database and then UNION them to get the original table
+
+```{r}
+table1 <- dbGetQuery(mydb, "SELECT * FROM ons_out WHERE rowid  <= 214") 
+dbWriteTable(mydb, "Table1", table1, overwrite=T)
+
+table2 <- dbGetQuery(mydb, "SELECT * FROM ons_out WHERE rowid  > 214") 
+dbWriteTable(mydb, "Table2", table2, overwrite=T)
+```
+
+These tables now appear in the database
+```{r}
+dbListTables(mydb)
+```
+
+
+```{r}
+table3 <- dbGetQuery(mydb, 
+"SELECT * FROM Table1 
+UNION ALL
+SELECT * FROM Table2")
+```
+
+```{r}
+dim(table3)
+```
+
+
 ## Dynamic SQL
 
 In this workshop, we have been running all of our SQL queries from inside R. This is not necessarily how you would normally use SQL. If you are working with a database, you will typically have access to some software which lets you enter SQL queries directly and execute them.
@@ -379,4 +383,5 @@ for (g_type in c("Country", "Region", "Unitary Authority")) {
 
 ```{r, echo=FALSE}
 DBI::dbDisconnect(mydb)
+file.remove("my-sqlite-db.sqlite")
 ```

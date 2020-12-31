@@ -200,19 +200,21 @@ summary {
 ## # ... with 418 more rows</code></pre>
 <div id="creating-a-database" class="section level2">
 <h2>Creating a database</h2>
-<p>We could create a database and add this data to a database, or we could create the database in memory using the <code>&quot;:memory:&quot;</code> instead of the database name</p>
+<p>SQL stands for &quot;Structured Query Language&quot;, and it is designed for querying tables of data stored in databases.</p>
+<p>Typically, the database is stored in a remote server somewhere. You connect to the server, via a programming language like R or python, or through specialised software like SQL Server Management Studio. You then send a query to the server in the form of a SQL statement, and the server sends back the data you asked for.</p>
+<p>For this workshop, the database will be stored in a file on our local machine instead. The R code below creates this database, called my-sqlite-db.sqlite, and adds the above table to it:</p>
 <pre class="r"><code>mydb &lt;- DBI::dbConnect(RSQLite::SQLite(), &quot;my-sqlite-db.sqlite&quot;)
 
 DBI::dbWriteTable(mydb, &quot;ons_out&quot;, ons_out, overwrite=T)</code></pre>
-<p><strong>Note</strong>, the my-sqlite-db.sqlite appears in my folder.<br />
-If I wanted to add data to an existing table I would replace the <code>overwrite=T</code> with <code>append=T</code></p>
+<p><strong>Note</strong>, the my-sqlite-db.sqlite appears in my folder.</p>
+<p>If I wanted to add data to an existing table I would replace the <code>overwrite=T</code> with <code>append=T</code></p>
 <p>I can also list the tables in my database - I find this useful as I forget the names</p>
-<pre class="r"><code>dbListTables(mydb)</code></pre>
-<pre><code>## [1] &quot;Table1&quot;   &quot;Table2&quot;   &quot;le_all&quot;   &quot;my_table&quot; &quot;ons_out&quot;</code></pre>
+<pre class="r"><code>DBI::dbListTables(mydb)</code></pre>
+<pre><code>## [1] &quot;le_all&quot;  &quot;ons_out&quot;</code></pre>
 <p>Also, when you finish with a database you need to disconnect</p>
-<pre class="r"><code># dbDisconnect(mydb)</code></pre>
+<pre class="r"><code># DBI::dbDisconnect(mydb)</code></pre>
+<p>We've used the DBI package in R here to create the database. You can also use functions from this package to connect to databases, and execute SQL queries, as we'll see below. But the focus of this workshop is on SQL itself, rather than using it inside R. Whether you're using R, python, or writing queries directly in database software, the syntax of the SQL queries will usually remain the same.</p>
 <p>We'll now review how to select the data we want from this table, using 'SELECT' queries.</p>
-<p>In this workshop we use the sqldf package in R. This lets us query tables in R using SQL queries, as if they were tables in SQL databases.</p>
 </div>
 <div id="selecting-columns" class="section level2">
 <h2>Selecting columns</h2>
@@ -448,24 +450,6 @@ WHERE ons_out.lad_name = 'GREAT BRITAIN'
 <h3>FULL OUTER JOIN</h3>
 <p>All rows in both tables are included.</p>
 </div>
-<div id="union" class="section level3">
-<h3>UNION</h3>
-<p>This is the sql equivalent of rbind. I'll just split the data into two tables, add them to the database and then UNION them to get the original table</p>
-<pre class="r"><code>table1 &lt;- dbGetQuery(mydb, &quot;SELECT * FROM my_table WHERE rowid  &lt;= 214&quot;) 
-dbWriteTable(mydb, &quot;Table1&quot;, table1, overwrite=T)
-
-table2 &lt;- dbGetQuery(mydb, &quot;SELECT * FROM my_table WHERE rowid  &gt; 214&quot;) 
-dbWriteTable(mydb, &quot;Table2&quot;, table2, overwrite=T)</code></pre>
-<p>These tables now appear in the database</p>
-<pre class="r"><code>dbListTables(mydb)</code></pre>
-<pre><code>## [1] &quot;Table1&quot;   &quot;Table2&quot;   &quot;le_all&quot;   &quot;my_table&quot; &quot;ons_out&quot;</code></pre>
-<pre class="r"><code>table3 &lt;- dbGetQuery(mydb, 
-&quot;SELECT * FROM Table1 
-UNION ALL
-SELECT * FROM Table2&quot;)</code></pre>
-<pre class="r"><code>dim(table3)</code></pre>
-<pre><code>## [1] 428  95</code></pre>
-</div>
 </div>
 <div id="applying-operations-over-multiple-rows" class="section level2">
 <h2>Applying operations over multiple rows</h2>
@@ -546,6 +530,24 @@ ORDER BY prop_below_18 desc
 ## 6 County              21518953         0.216              19.2              21.5
 ## 7 Council Area         5463300         0.196              14.7              16.5</code></pre>
 <p>Note that metropolitan districts are clearly contained within metropolitan counties, and the life expectancy for females will be slightly off because we used total population instead of population of 65 year olds to weight the average.</p>
+<div id="union" class="section level3">
+<h3>UNION</h3>
+<p>UNION lets you combine the rows from two separate tables into one larger table (the equivalent of rbind in R). I'll just split the data into two tables, add them to the database and then UNION them to get the original table</p>
+<pre class="r"><code>table1 &lt;- dbGetQuery(mydb, &quot;SELECT * FROM ons_out WHERE rowid  &lt;= 214&quot;) 
+dbWriteTable(mydb, &quot;Table1&quot;, table1, overwrite=T)
+
+table2 &lt;- dbGetQuery(mydb, &quot;SELECT * FROM ons_out WHERE rowid  &gt; 214&quot;) 
+dbWriteTable(mydb, &quot;Table2&quot;, table2, overwrite=T)</code></pre>
+<p>These tables now appear in the database</p>
+<pre class="r"><code>dbListTables(mydb)</code></pre>
+<pre><code>## [1] &quot;Table1&quot;  &quot;Table2&quot;  &quot;le_all&quot;  &quot;ons_out&quot;</code></pre>
+<pre class="r"><code>table3 &lt;- dbGetQuery(mydb, 
+&quot;SELECT * FROM Table1 
+UNION ALL
+SELECT * FROM Table2&quot;)</code></pre>
+<pre class="r"><code>dim(table3)</code></pre>
+<pre><code>## [1] 428   7</code></pre>
+</div>
 </div>
 <div id="dynamic-sql" class="section level2">
 <h2>Dynamic SQL</h2>
@@ -595,6 +597,7 @@ ORDER BY prop_below_18 desc
 ##  9 Cardiff                               366903
 ## 10 Leicester                             354224
 ## # ... with 69 more rows</code></pre>
+<pre><code>## [1] TRUE</code></pre>
 </div>
 </div>
 
