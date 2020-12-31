@@ -208,7 +208,7 @@ summary {
 DBI::dbWriteTable(mydb, &quot;ons_out&quot;, ons_out, overwrite=T)</code></pre>
 <p><strong>Note</strong>, the my-sqlite-db.sqlite appears in my folder.</p>
 <p>If I wanted to add data to an existing table I would replace the <code>overwrite=T</code> with <code>append=T</code></p>
-<p>I can also list the tables in my database - I find this useful as I forget the names</p>
+<p>I can also list the tables in my database.</p>
 <pre class="r"><code>DBI::dbListTables(mydb)</code></pre>
 <pre><code>## [1] &quot;ons_out&quot;</code></pre>
 <p>Also, when you finish with a database you need to disconnect</p>
@@ -521,7 +521,7 @@ FROM ons_out WHERE geo_type = 'Metropolitan District'
 ##   total_pop_in_met_districts
 ##                        &lt;dbl&gt;
 ## 1                   12077146</code></pre>
-<p>Other functions you can apply here include mean(.), max(.), min(.).</p>
+<p>Other functions you can apply here include avg(.), max(.), min(.).</p>
 <p>But what if we want to apply the operation not to all rows, but within certain groups of rows? For example, suppose I want to take all of the sub-national and sub-regional geo_types, and for each one, compute the proportion of the population below 18. We can do that using GROUP BY, which ensures that the operations will be applied within each group:</p>
 <pre class="r"><code>dplyr::tibble(DBI::dbGetQuery(mydb, &quot;
 SELECT geo_type, sum(all_ages) AS population,
@@ -655,7 +655,6 @@ SELECT * FROM Table2&quot;)</code></pre>
 ##  9 Cardiff                               366903
 ## 10 Leicester                             354224
 ## # ... with 69 more rows</code></pre>
-<pre><code>## [1] TRUE</code></pre>
 </div>
 </div>
 

@@ -54,7 +54,8 @@ DBI::dbWriteTable(mydb, "ons_out", ons_out, overwrite=T)
 
 If I wanted to add data to an existing table I would replace the `overwrite=T` with `append=T`
 
-I can also list the tables in my database - I find this useful as I forget the names
+I can also list the tables in my database.
+
 ```{r}
 DBI::dbListTables(mydb)
 ```
@@ -322,7 +323,7 @@ FROM ons_out WHERE geo_type = 'Metropolitan District'
                     "))
 ```
 
-Other functions you can apply here include mean(.), max(.), min(.).
+Other functions you can apply here include avg(.), max(.), min(.).
 
 But what if we want to apply the operation not to all rows, but within certain groups of rows? For example, suppose I want to take all of the sub-national and sub-regional geo_types, and for each one, compute the proportion of the population below 18. We can do that using GROUP BY, which ensures that the operations will be applied within each group:
 
@@ -422,7 +423,7 @@ for (g_type in c("Country", "Region", "Unitary Authority")) {
 ```
 
 
-```{r, echo=FALSE}
+```{r, include=FALSE}
 DBI::dbDisconnect(mydb)
 file.remove("my-sqlite-db.sqlite")
 ```
