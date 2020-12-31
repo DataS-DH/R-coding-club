@@ -175,6 +175,19 @@ WHERE lad_name LIKE 'H%'
                     "))
 ```
 
+**Caution:** whether or not string comparisons are case sensitive is not standard. It can vary by the type of database. For the SQLite database being used here, the below query returns no results:
+
+```{r}
+dplyr::tibble(DBI::dbGetQuery(mydb, "
+SELECT lad_name,
+all_ages,
+(all_ages - over_18) / all_ages AS prop_under_18
+FROM ons_out
+WHERE geo_type = 'rEgIon'
+                    "))
+```
+
+But if this database were stored on Microsoft SQL Server, the above query would still select the rows of geo_type 'Region'.
 
 ## Sorting the output
 

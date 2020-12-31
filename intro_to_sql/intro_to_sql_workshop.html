@@ -382,6 +382,17 @@ WHERE lad_name LIKE 'H%'
 ##  9 Herefordshire, County of   192801         0.199
 ## 10 Huntingdonshire            177963         0.215
 ## # ... with 16 more rows</code></pre>
+<p><strong>Caution:</strong> whether or not string comparisons are case sensitive is not standard. It can vary by the type of database. For the SQLite database being used here, the below query returns no results:</p>
+<pre class="r"><code>dplyr::tibble(DBI::dbGetQuery(mydb, &quot;
+SELECT lad_name,
+all_ages,
+(all_ages - over_18) / all_ages AS prop_under_18
+FROM ons_out
+WHERE geo_type = 'rEgIon'
+                    &quot;))</code></pre>
+<pre><code>## # A tibble: 0 x 3
+## # ... with 3 variables: lad_name &lt;chr&gt;, all_ages &lt;dbl&gt;, prop_under_18 &lt;lgl&gt;</code></pre>
+<p>But if this database were stored on Microsoft SQL Server, the above query would still select the rows of geo_type 'Region'.</p>
 </div>
 <div id="sorting-the-output" class="section level2">
 <h2>Sorting the output</h2>
