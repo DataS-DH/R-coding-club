@@ -55,7 +55,7 @@ dbListTables(mydb)
 
 Also, when you finish with a database you need to disconnect
 ```{r}
-dbDisconnect(mydb)
+# dbDisconnect(mydb)
 ```
 
 
