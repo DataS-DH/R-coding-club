@@ -210,7 +210,7 @@ DBI::dbWriteTable(mydb, &quot;ons_out&quot;, ons_out, overwrite=T)</code></pre>
 <p>If I wanted to add data to an existing table I would replace the <code>overwrite=T</code> with <code>append=T</code></p>
 <p>I can also list the tables in my database - I find this useful as I forget the names</p>
 <pre class="r"><code>DBI::dbListTables(mydb)</code></pre>
-<pre><code>## [1] &quot;le_all&quot;  &quot;ons_out&quot;</code></pre>
+<pre><code>## [1] &quot;ons_out&quot;</code></pre>
 <p>Also, when you finish with a database you need to disconnect</p>
 <pre class="r"><code># DBI::dbDisconnect(mydb)</code></pre>
 <p>We've used the DBI package in R here to create the database. You can also use functions from this package to connect to databases, and execute SQL queries, as we'll see below. But the focus of this workshop is on SQL itself, rather than using it inside R. Whether you're using R, python, or writing queries directly in database software, the syntax of the SQL queries will usually remain the same.</p>
@@ -262,6 +262,53 @@ FROM ons_out
 ##  9 Middlesbrough       140980         0.239
 ## 10 Northumberland      322434         0.194
 ## # ... with 418 more rows</code></pre>
+<p>Another really useful tool for creating new columns is &quot;CASE WHEN&quot;. For example, the statement below creates a new column classifying each area as younger than average or older than average, based on the proportion under 18:</p>
+<pre class="r"><code>dplyr::tibble(DBI::dbGetQuery(mydb, &quot;
+SELECT lad_name,
+all_ages,
+(all_ages - over_18) / all_ages AS prop_under_18,
+CASE WHEN (all_ages - over_18) / all_ages &lt; 0.219 THEN 'Older than average'
+WHEN (all_ages - over_18) / all_ages &gt; 0.221 THEN 'Younger than average'
+ELSE 'Average' END AS age_classification
+FROM ons_out
+                    &quot;))</code></pre>
+<pre><code>## # A tibble: 428 x 4
+##    lad_name          all_ages prop_under_18 age_classification  
+##    &lt;chr&gt;                &lt;dbl&gt;         &lt;dbl&gt; &lt;chr&gt;               
+##  1 UNITED KINGDOM    66796807         0.220 Average             
+##  2 GREAT BRITAIN     64903140         0.220 Average             
+##  3 ENGLAND AND WALES 59439840         0.222 Younger than average
+##  4 ENGLAND           56286961         0.223 Younger than average
+##  5 NORTH EAST         2669941         0.208 Older than average  
+##  6 County Durham       530094         0.199 Older than average  
+##  7 Darlington          106803         0.221 Average             
+##  8 Hartlepool           93663         0.223 Younger than average
+##  9 Middlesbrough       140980         0.239 Younger than average
+## 10 Northumberland      322434         0.194 Older than average  
+## # ... with 418 more rows</code></pre>
+<p>Finally, we can select all existing columns in the table using *:</p>
+<pre class="r"><code>dplyr::tibble(DBI::dbGetQuery(mydb, &quot;
+SELECT *,
+(all_ages - over_18) / all_ages AS prop_under_18,
+CASE WHEN (all_ages - over_18) / all_ages &lt; 0.219 THEN 'Older than average'
+WHEN (all_ages - over_18) / all_ages &gt; 0.221 THEN 'Younger than average'
+ELSE 'Average' END AS age_classification
+FROM ons_out
+                    &quot;))</code></pre>
+<pre><code>## # A tibble: 428 x 9
+##    lad_code lad_name geo_type all_ages over_18 over_85 over_65 prop_under_18
+##    &lt;chr&gt;    &lt;chr&gt;    &lt;chr&gt;       &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;         &lt;dbl&gt;
+##  1 K020000~ UNITED ~ Country  66796807  5.21e7 1042090  1.18e7         0.220
+##  2 K030000~ GREAT B~ Country  64903140  5.06e7 1017085  1.15e7         0.220
+##  3 K040000~ ENGLAND~ Country  59439840  4.62e7  933656  1.05e7         0.222
+##  4 E920000~ ENGLAND  Country  56286961  4.37e7  879778  9.84e6         0.223
+##  5 E120000~ NORTH E~ Region    2669941  2.12e6   43705  5.09e5         0.208
+##  6 E060000~ County ~ Unitary~   530094  4.24e5    8434  1.06e5         0.199
+##  7 E060000~ Darling~ Unitary~   106803  8.32e4    1842  2.09e4         0.221
+##  8 E060000~ Hartlep~ Unitary~    93663  7.28e4    1556  1.74e4         0.223
+##  9 E060000~ Middles~ Unitary~   140980  1.07e5    1960  2.22e4         0.239
+## 10 E060000~ Northum~ Unitary~   322434  2.60e5    6176  7.63e4         0.194
+## # ... with 418 more rows, and 1 more variable: age_classification &lt;chr&gt;</code></pre>
 </div>
 <div id="selecting-rows" class="section level2">
 <h2>Selecting rows</h2>

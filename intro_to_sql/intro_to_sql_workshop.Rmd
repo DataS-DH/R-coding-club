@@ -96,6 +96,34 @@ FROM ons_out
                     "))
 ```
 
+Another really useful tool for creating new columns is "CASE WHEN". For example, the statement below creates a new column classifying each area as younger than average or older than average, based on the proportion under 18:
+
+```{r}
+dplyr::tibble(DBI::dbGetQuery(mydb, "
+SELECT lad_name,
+all_ages,
+(all_ages - over_18) / all_ages AS prop_under_18,
+CASE WHEN (all_ages - over_18) / all_ages < 0.219 THEN 'Older than average'
+WHEN (all_ages - over_18) / all_ages > 0.221 THEN 'Younger than average'
+ELSE 'Average' END AS age_classification
+FROM ons_out
+                    "))
+```
+
+Finally, we can select all existing columns in the table using *:
+
+```{r}
+dplyr::tibble(DBI::dbGetQuery(mydb, "
+SELECT *,
+(all_ages - over_18) / all_ages AS prop_under_18,
+CASE WHEN (all_ages - over_18) / all_ages < 0.219 THEN 'Older than average'
+WHEN (all_ages - over_18) / all_ages > 0.221 THEN 'Younger than average'
+ELSE 'Average' END AS age_classification
+FROM ons_out
+                    "))
+```
+
+
 ## Selecting rows
 
 Suppose we don't want all the rows in the table, but only those which satisfy certain criteria. We can do this using a WHERE clause, which goes after the table name. The below SQL query only returns rows which correspond to regions.
