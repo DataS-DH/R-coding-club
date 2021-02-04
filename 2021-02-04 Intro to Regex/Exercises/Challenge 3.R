@@ -1,4 +1,4 @@
-### CHALLENGE 3: Words that start with a consonant and end with a vowel ###
+### CHALLENGE 3: British mobile phone numbers ###
 
 test_numbers <- c('07765204912',
                   '09125839053',
