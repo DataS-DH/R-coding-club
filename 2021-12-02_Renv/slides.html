@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>renv: Package Management for R</title>
+    <meta charset="utf-8" />
+    <link href="slides_files/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="slides_files/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# renv: Package Management for R
+### 2nd Dec 2021
+
+---
+
+class: center
+
+# For Pythonistas
+--
+
+Life is &lt;b&gt;gooooood&lt;/b&gt; for us.  
+
+--
+
+Python does this very well.
+
+--
+
+So sit back relax and enjoy.  
+
+--
+
+&lt;img src="./img/relax.jpg"&gt;
+
+---
+
+# Disclaimer
+
+&lt;center&gt; Borrows from Kevin Ushey's (developer of `renv`) talk from RStudio Conf 2020 &lt;/center&gt;
+
+---
+# The Motivation
+
+--
+
+Have you ever finished a project, come back sometime later, and asked:
+
+--
+
+- _Why is my code now throwing an error? It worked before..._
+
+--
+
+- _What happened to my `ggplot2` plots?  I know they worked before..._
+
+--
+
+- _I re-ran the analysis, but now my results aren't the same !!!  This was right before, what is happening !!??_
+
+--
+
+OR
+
+--
+
+- _I shared my code with colleagues, but it only works on my machine.  Manager's nightmare_
+
+--
+
+The goal is to make sure this never happens again!
+
+---
+
+# Before `renv` there was `packrat`
+
+--
+
+&gt; _In the beginning Packrat was created. This has made a lot of people very angry and been widely regarded as a bad move._
+
+--
+
+`packrat` works, but for the average user it's frustrating to use and it's challenging to recover when errors arise.
+
+--
+
+### &lt;center&gt;renv's goal is to be &lt;font color="red"&gt;a better Packrat&lt;/font&gt;.&lt;/center&gt;
+
+---
+
+# What is `renv`?
+
+--
+
+`renv` is a toolkit used to manage _libraries of **R** packages_.
+
+--
+
+You can use `renv` to make your projects more:
+
+--
+
+- **Isolated**: Each project gets its own library of **R** packages, so you can upgrade and change package versions in one project without worrying about breaking your other projects.
+
+--
+
+- **Portable**: Because `renv` captures the state of your **R** packages within a _lockfile_, so you can more easily share and collaborate on projects with others, and ensure that everyone is working from a common base.  **More on this later**
+
+--
+
+- **Reproducible**: Use `renv::snapshot()` to save the state of your **R** library to the _lockfile_ `renv.lock`. You can later use `renv::restore()` to restore your **R** library exactly as specified in the lockfile.
+
+--
+
+`renv` attempts to prescribe a default workflow that works for most, but remains flexible enough that alternate workflows can be built on top of the tools provided by `renv`.
+
+---
+
+# How packages work
+
+Let's briefly outline how **R** utilizes packages.
+
+--
+
+You've started a new **R** project
+
+--
+
+You've downloaded `dplyr`, and you're ready to load and use it in your project:
+
+--
+
+```r
+library(dplyr)
+```
+
+--
+
+When this code is run, **R** searches the _active library paths_ for an installed copy of the `dplyr` package, then loads it.  
+
+--
+
+What does this mean ? ...
+
+--
+
+1. What is a *library path*?
+
+--
+
+2. What are the _active_ library paths?
+
+--
+
+3. How does **R** search these library paths when loading a package?
+
+---
+
+
+# What is a Library Path?
+
+From the [R extensions](https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Creating-R-packages) manual:
+
+--
+
+&gt; A directory into which packages are installed.
+
+--
+
+The `.libPaths()` function is used to get and set the library paths for an **R** session. For example:
+
+--
+
+
+```r
+&gt; .libPaths()
+[1] "C:/Users/jcrosbie/AppData/Local/R/win-library/4.0"
+[2] "C:/Program Files/R/R-4.0.2/library"    
+```
+
+
+--
+
+In this case, I have my own **user** library, which is first in the list. This is where packages I choose to download and install normally get installed.  
+
+--
+
+The last library in the list is the **system** library. This is where the default packages that come with **R** are installed.
+
+--
+
+Each **R** session can be configured to use multiple/different library paths -- ie. multiple/different directories that **R** will search when attempting to find and load a packages.
+
+---
+
+# What is a Library Path?
+
+--
+
+**R** searches the active library paths, _in order_, to find an installation of the requested package.
+
+--
+
+The _first_ installation of the package that is discovered is loaded. The package's dependencies are also loaded from these same library paths.
+
+--
+
+**Aside** When **R** looks for a function, it will search the name space for a function of that name and use the _first_ function it finds that matches that name.  This is why colleagues, like Martine, make it explicit which library the function is from:
+
+
+```r
+dplr::rename( ... )
+```
+
+--
+
+Back to our example:
+
+--
+
+
+```r
+library(dplyr)
+```
+
+--
+
+When this code is run, **R** will search the *active library paths* for an installation of the `dplyr` package, and load the first one it finds. 
+
+--
+
+You can use `find.package()` to search the library paths for an installed package:
+
+--
+
+
+```r
+&gt; find.package("dplyr")
+[1] "C:/Users/jcrosbie/AppData/Local/R/win-library/4.0/dplyr"
+```
+
+---
+
+# The Problem
+
+--
+
+By default, each **R** session uses the _same_ set of library paths.
+
+--
+
+![](img/shared-library.svg)
+
+--
+
+So if you were to install `dplyr 0.8.2`, that package would then become available in all three projects.
+
+---
+
+# The Problem
+
+However, _different_ projects may have _different_ package dependencies. For example, suppose:
+
+--
+
+- **Project 1** requires `dplyr 0.7.8`,
+
+--
+
+- **Project 2** requires `dplyr 0.8.2`, and
+
+--
+
+- **Project 3** requires `dplyr 1.0.5`.
+
+--
+
+Because over time you've updated dplyr.  Unfortunately, these projects _share the same library paths_!
+
+--
+
+Hence, installing a newer versions of `dplyr` implies changing the version of `dplyr` used by **each** project.
+
+--
+
+This could spell disaster.....
+
+--
+![](img/jenga-fail.gif)
+
+
+
+
+---
+
+# The Solution
+
+The solution is to use _project-local libraries_, to ensure that each project gets its own unique library of **R** packages.
+
+--
+
+![](img/project-library.svg)
+
+--
+
+By using _project-local libraries_, you can rest assured that upgrading the packages used in one project will not risk breaking your other projects.
+
+---
+
+# The Solution: `renv`
+
+--
+
+- Gives each project its own _project-local library_
+
+--
+
+- Makes it simple and straightforward for **R** to use the _project-local library_,
+
+--
+
+- Provides tools for managing the **R** packages installed in these _project-local libraries_,
+
+--
+
+So "the experience is seamless and you can use `renv` without being an expert on `renv`".
+
+--
+
+![](img/screaming-gif.gif)
+
+--
+
+Not quite, more on this later!
+
+---
+
+# Initializing a Project
+
+The first step in activating `renv` for a project is:
+
+--
+
+```r
+renv::init()
+```
+
+--
+
+This function _**forks**_ the state of your default **R** libraries into a project-local library, and then prepares the infrastructure required to use `renv` in that project.
+
+--
+
+In particular, a project-local `.Rprofile` is created (or amended), which is then used by new **R** sessions to automatically initialize `renv` and ensure the project-local library is used.
+
+--
+
+After calling `renv::init()`, you can continue working **exactly as you did before.** The only difference is that packages will now be installed to, and loaded from, your **local** project library.
+
+--
+
+The library paths (as reported by `.libPaths()`) will now be changed.
+
+
+```r
+&gt; .libPaths()
+[1] "C:/C-LOCAL/work-code/LeaRning/R-env-tutorial/renv/library/R-4.0/x86_64-w64-mingw32"
+[2] "C:/Users/jcrosbie/AppData/Local/Temp/1/RtmpIJNCJE/renv-system-library"
+```
+
+
+
+
+
+--
+
+- **Note** Under the new renv folder in the project directory is a copy of all the libraries.  add `renv/` to your `.gitignore` 
+
+
+
+
+
+
+---
+
+# Saving and Loading
+
+The second goal is to make it possible to _save_ and _load_ the state of your project-local libraries.
+
+--
+
+In `renv` this is referred to as _snapshot_ and _restore_ .
+
+--
+
+
+```r
+renv::snapshot()  # save the project's library state
+renv::restore()   # load the project's library state
+```
+
+---
+
+
+# Snapshot
+
+You can capture the state of a project library using:
+
+--
+
+```r
+&gt; renv::snapshot()
+The following package(s) will be updated in the lockfile:
+
+# CRAN ===============================
+- markdown    [* -&gt; 1.1]
+- rmarkdown   [* -&gt; 2.1]
+- yaml        [* -&gt; 2.2.0]
+
+Do you want to proceed? [y/N]: y
+* Lockfile written to 'C:/C-LOCAL/work-code/LeaRning/R-env-tutorial/renv.lock'.
+```
+
+--
+
+The state of your project library will be encoded into a _lockfile_, called `renv.lock`.
+
+--
+
+The _lockfile_ is a text (JSON) file, enumerating the packages installed in your project, their versions, and their _sources_.
+
+---
+
+# Lockfile Example
+
+```json
+{
+  "R": {
+    "Version": "4.0.1",
+    "Repositories": [
+      {
+        "Name": "CRAN",
+        "URL": "https://cran.rstudio.com"
+      }
+    ]
+  },
+  "Packages": {
+    "renv": {
+      "Package": "renv",
+      "Version": "0.9.2",
+      "Source": "Repository",
+      "Repository": "CRAN"
+    },
+    &lt; ... other package records ... &gt;
+  }
+}
+```
+
+---
+
+# Lockfiles
+
+The lockfile encodes the information required to later recover and re-install packages as necessary. This is useful for:
+
+--
+
+- Time capsules, where you might want to freeze a project such that you can later return to the project with a record of the packages originally used to run the project,
+
+--
+
+- Collaborative workflows, where you might want to ensure all collaborators are working with the exact same set of packages, and
+
+--
+
+- Deployments, where you'd like to be sure that your project, when run remotely, uses the exact same set of packages that you were testing with locally.
+
+
+---
+
+# Restore
+
+Given a lockfile `renv.lock` previously created by `renv::snapshot()`, you can restore the state of your project library using `renv::restore()`:
+
+--
+
+```r
+&gt; renv::restore()
+The following package(s) will be updated:
+
+# CRAN ===============================
+- markdown    [* -&gt; 1.1]
+- rmarkdown   [* -&gt; 2.1]
+- yaml        [* -&gt; 2.2.0]
+
+Do you want to proceed? [y/N]: y
+Installing markdown [1.1] ...
+	OK (linked cache)
+Installing yaml [2.2.0] ...
+	OK (linked cache)
+Installing rmarkdown [2.1] ...
+	OK (linked cache)
+```
+
+--
+
+Calling `renv::restore()` will download and re-install all of the declared packages as necessary.
+
+---
+
+# Restore
+
+`renv` contains the machinery required to install packages from many sources, including:
+
+--
+
+- CRAN
+- GitHub
+- Gitlab
+- Bitbucket
+- etc
+
+`renv` also understands how to authenticate with private repositories as well. See https://rstudio.github.io/renv/articles/renv.html#authentication for more details.
+
+---
+# However 
+
+--
+
+`renv` does not play well with SharePoint.
+
+--
+
+Can lead to sync issues.
+
+--
+
+So, a suggested workflow is:
+
+--
+
+1. Use `renv::init()` to initialize a project with a project-local library,
+
+--
+
+2. Use `renv::snapshot()` to save the project-local library's state,
+
+--
+
+3. User `renv::deactivate()` to deactivate project.  This will keep the lockfile with the packages, but alters the .Rproj file to not use `renv`.
+
+--
+
+4. User `library(remotes)` and `install_version("emmeans", "1.4.5")` to install the specifc versions of the packages found in the lockfile.
+
+---
+
+
+class: center, bottom, inverse
+
+&lt;br/&gt;
+
+Install `renv` from CRAN with:
+
+`install.packages("renv")`
+
+View the `renv` [pkgdown](https://pkgdown.r-lib.org/) documentation online at:
+
+https://rstudio.github.io/renv/
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"seal": true,
+"ratio": "16:9",
+"highlightStyle": "github",
+"highlightLines": true,
+"highlightLanguage": "r",
+"countIncrementalSlides": false,
+"css": ["default", "styles.css"]
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
