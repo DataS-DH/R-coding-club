@@ -1,8 +1,6 @@
 ---
 title: "Data visualisation in R using ggplot2"
-output:
-  html_document:
-    df_print: paged
+output: github_document
 ---
 
 ```{r message=FALSE, warning=FALSE}
