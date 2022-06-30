@@ -27,3 +27,17 @@ The scripts cover concepts of R to help users understand how R works in the back
   <li> Why does it in that way? </li>
   <li> How can I round in a way that I expect it to </li>
     </ul> 
+
+<b> Vectors, matricies dataframes & tibbles </b> 
+      <ul> 
+  <li> What are vectors, matricies, data.frames and tibbles? </li>
+  <li> How are they related? </li>
+  <li> What properties do they all have? </li>
+    </ul> 
+    
+<b> Map function </b> 
+      <ul> 
+  <li> What is it and what is it used for? </li>
+  <li> Multiple inputs </li>
+    </ul>     
+    
