@@ -870,4 +870,37 @@ def list_to_sentence(alist, oxford_comma = True):
     return sentence
            
  
- 
+if __name__ == '__main__':
+    import numpy as np
+    
+    np.random.seed(42)
+    df1 = pd.DataFrame(np.random.randn(2022-1980, 1)*100,
+                       index = list(range(1980, 2022)),
+                       columns = ['UK'])
+    df1.index.name = 'Year'
+    
+    
+    trusts = ['RX6','RX7','RX8','RX9','RYA','RYC','RYD','RYE','RYF','RRU']
+    regions = ['North East and Yorkshire','North West',
+               'North East and Yorkshire','Midlands', 'Midlands',
+               'East of England','South East','South East','South West',
+               'London']
+    regions = np.array(regions)
+    regions.transpose()
+    
+    df2 = pd.DataFrame(np.random.randn(2022-1980, 10)*100,
+                       index = list(range(1980, 2022)),
+                       columns = trusts)
+    df2.index.name = 'Year'
+    df2_region = pd.DataFrame(regions, index=trusts, columns = ['Region']).T
+    df2_region.index.name = 'Year'
+    df2 = pd.concat([df2_region, df2], axis=0)
+    
+    
+    produce_dataset('my_dataset.xlsx', 'test template.xlsx', 
+                    [df1, df2, df2, df2])
+
+
+
+    
+    
