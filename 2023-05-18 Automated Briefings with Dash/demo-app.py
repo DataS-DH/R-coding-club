@@ -44,5 +44,3 @@ def update_graph(col_chosen):
 # Run the app
 if __name__ == '__main__':
     app.run_server(debug=True)
-
-# See more at https://dash.plotly.com/tutorial
