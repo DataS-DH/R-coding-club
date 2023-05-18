@@ -1,0 +1,81 @@
+##Reshaping data###
+####Coffee and Coding######
+
+#load libraries
+library(tidyverse)
+library(purrr)
+library(openxlsx)
+library(magrittr)
+
+#read in tidy data 
+tidy_data <- read.csv('./output/tidy_data.csv', stringsAsFactors = FALSE) 
+
+#mutate the publication date column in date format 
+data_tidy<- tidy_data %>%
+             dplyr::mutate(pub_date = as.Date(pub_date, format = '%d %B %Y'))
+
+#select a question you want to look at 
+keyquestions <- c('support or oppose')
+
+#filter data by that question  
+key_d <- data_tidy %>% 
+            dplyr::filter(stringr::str_detect(
+              question, paste0(keyquestions, collapse = "|"))) #this paste0 is in place if you have more than one pattern 
+
+#checking that I only have that question 
+print(unique(key_d$question))
+
+#check the answer types for that question 
+answer_types <- key_d %>% 
+                  group_by(answer) %>% summarise(n=n()) %>% 
+                                        ungroup() %>% arrange(-n)
+
+#you can export data splitting by category or answer types
+category_types <- key_d %>% 
+                      group_by(category) %>% summarise(n=n()) %>% 
+                                        ungroup() %>% arrange(-n)
+
+##I am going to export my data with the categories in each tab 
+#so 1 tab in excel = 1 category of surveyed sample 
+#each tab will have different answer types for that category 
+
+  # Create data frames for each category of sample 
+  all <- dplyr::filter(key_d, grepl('All person', category, ignore.case = TRUE)) %>%
+                                  na.omit(value)
+  
+  age <- dplyr::filter(key_d, grepl('^(\\d\\d)', category) & 
+                         !grepl('Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)', category)) %>%
+                                              na.omit(value)
+  print(unique(age$category))
+  
+  gender <- dplyr::filter(key_d, grepl('Men|Women', category,ignore.case = TRUE)) %>%
+                                       na.omit(value)
+  
+  region <- dplyr::filter(key_d, 
+                          grepl('^(Eng|Scot|Wal|South|East|West|North|York|Lond)', 
+                                category)) %>% na.omit(value)
+  
+  #making a list of all data frames
+  data_cat <- list(all = all,
+                   age = age, 
+                   gender = gender,
+                   region = region)
+
+
+#let's view what 1 of my excel tabs will look like 
+view(data_cat$all) 
+
+#sort through my list of data frames 
+final <- purrr::map(data_cat, ~ arrange(.x, pub_date, question, category))
+final2 <- purrr::map(final, ~ select(.x, pub_date, question, category, answer, value, file, sheet, survey_date))
+
+view(final$all)
+
+#export to excel with the sheet name = each data frame name in list 
+for (i in 1:length(final2)){
+  openxlsx::write.xlsx(final2,
+                       file = paste0(keyquestions,"_", 
+                                     " ", Sys.Date(), ".xlsx"), 
+                       sheetNames = names(final2[i])
+  )
+}

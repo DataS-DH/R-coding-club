@@ -1,0 +1,1562 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Importing data from published sources</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Martine Wauben" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+    <script src="libs/kePrint-0.0.1/kePrint.js"></script>
+    <link rel="stylesheet" href="my-theme.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Importing data from published sources
+### Martine Wauben
+### DHSC Data Science Hub
+### 2020-09-10 (updated: 2020-09-03)
+
+---
+
+
+
+
+
+class: inverse
+
+# Session overview
+
+* What is (tidy) data?
+* Importing .csv
+* Importing .xls
+* Cleaning .xls
+* Importing .xlsx
+* Importing .zip
+* Handling common data problems
+* Why bother
+
+--
+
+## By the end, you will know how to use...
+
+* `readr` for reading CSV's
+* `readxl` for reading XLS/XLSX
+* `downloader` for downloading XLS(X) and ZIP
+* `unzip` for handling ZIP
+* `janitor` for cleaning
+
+---
+
+# What is data?
+
+.pull-right[![](https://media0.giphy.com/media/BoC8nVlu3oNRsBJw30/giphy.gif)]
+
+.pull-left[
+
+&gt; things known or assumed as facts, making the basis of reasoning or calculation.
+
+But in our life:
+
+&gt; the quantities, characters, or symbols on which operations are performed by a computer, which may be stored and transmitted in the form of electrical signals and recorded on magnetic, optical, or mechanical recording media.
+
+However, this still **does not mean it has to start off tidy and tabular**!
+]
+
+---
+# What is tidy data?
+
+![](https://d33wubrfki0l68.cloudfront.net/6f1ddb544fc5c69a2478e444ab8112fb0eea23f8/91adc/images/tidy-1.png)
+
+1. Each variable must have its own column.
+2. Each observation must have its own row.
+3. Each value must have its own cell.
+
+
+&gt; “Tidy datasets are all alike, but every messy dataset is messy in its own way." - Hadley Wickham
+
+---
+# What is data at DHSC?
+
+* NHS Digital
+* NHS England
+* Public Health England
+* ONS
+* AB-specific databases / portals
+* etc.
+
+--
+
+Usually looking roughly like this...
+
+.center[&lt;img src='https://i.imgur.com/pT3S8ij.png' height = '300px' width = '700px'&gt;]
+
+---
+
+class: inverse
+
+# Handling different types of file
+
+--
+
+**For R beginners:**
+
+**Functions** describe calculations you apply to to a dataset, like rolling averages or regressions. They take input, often including the data you want to apply the function to and any additional parameters (like 'how big is the rolling window').
+
+**Packages** are bundles of functions that work well together. You have to install a package to allow you to use all the functions inside it.
+
+
+
+```r
+install.packages('packagename')
+data_out &lt;- packagename::functionname(data_in, parameter_in = 5)
+```
+
+Later on, you can refer to `data_out` as if it was a spreadsheet, and apply new functions to columns inside it. 
+
+
+```r
+avg_value &lt;- mean(data_out$variable)
+```
+
+
+---
+
+# Importing .csv
+
+Machine-readable directly from the URL! Should not have major data cleaning problems.
+
+
+```r
+csv_data &lt;- readr::read_csv('https://files.digital.nhs.uk/3B/57FD0B/ESR_ABSENCE_annual_csv_HEE.csv')
+```
+
+```
+## Parsed with column specification:
+## cols(
+##   Date = col_character(),
+##   HEE_region_code = col_character(),
+##   HEE_region_name = col_character(),
+##   `Org Code` = col_character(),
+##   `Org Name` = col_character(),
+##   `Org Type` = col_character(),
+##   `FTE Days Sick` = col_double(),
+##   `FTE Days Available` = col_double(),
+##   `SA Rate (%)` = col_double(),
+##   Sort_Date = col_double()
+## )
+```
+
+Automatically reads headers and variable types (based on the first 1000 rows).
+
+---
+
+# Importing .xls
+
+Can have formatting and data type issues, but relatively simple files. Proprietary software, but R package has your back. 
+
+
+```r
+downloader::download('https://files.digital.nhs.uk/07/9F94A7/hosp-epis-stat-hesnational-2017-18.xls', 
+                     destfile='xls_data.xls', mode='wb')
+xls_data &lt;- readxl::read_excel('xls_data.xls',
+                               sheet = 3)
+```
+
+```
+## New names:
+## * `` -&gt; ...1
+## * `` -&gt; ...2
+## * `` -&gt; ...3
+## * `` -&gt; ...4
+## * `` -&gt; ...5
+## * … and 9 more problems
+```
+
+---
+
+# .xls problems
+
+.pull-right[![](https://i.imgur.com/nFlY8yb.png)]
+
+.pull-left[
+
+Very human-friendly, but not 'tidy' in the R sense of the word!
+
+![](https://media0.giphy.com/media/g79am6uuZJKSc/source.gif)
+]
+
+--
+
+.pull-left[
+To fix:
+
+* Explanatory/empty rows at the beginning
+* Multiple tables in one sheet
+* Multiple header rows
+* R-unfriendly column names
+
+]
+
+---
+
+# Cleaning .xls
+
+Fixing the data issues.
+
+* **Explanatory/empty rows at the beginning**
+
+
+```r
+xls_data &lt;- readxl::read_excel('xls_data.xls',
+                               sheet = 3,
+*                              skip = 6)
+```
+
+---
+
+# Cleaning .xls
+
+Fixing the data issues.
+
+* **Explanatory/empty rows at the beginning**
+* **Multiple tables in one sheet**
+
+
+```r
+xls_data &lt;- readxl::read_excel('xls_data.xls',
+                               sheet = 3,
+                               skip = 6,
+*                              n_max = 32)
+```
+
+---
+
+# Cleaning .xls 
+
+Fixing the data issues.
+
+* **Explanatory/empty rows at the beginning**
+* **Multiple tables in one sheet**
+* **Multiple header rows**
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Year &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Total deliveries &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Person conducting delivery &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; ...4 &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; ...5 &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; ...6 &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; ...7 &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; ...8 &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Unknown* &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Unknown % &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Total excl. unknown &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Hospital doctor % &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Midwife % &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; GP / Other % &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 1989-90 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 633500 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; − &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; − &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; − &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.23699999999999999 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.75599999999999989 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.0080000000000000002 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+```
+## [1] "Year"                       "Total deliveries"          
+## [3] "Person conducting delivery" "...4"                      
+## [5] "...5"                       "...6"                      
+## [7] "...7"                       "...8"
+```
+
+---
+
+# Cleaning .xls
+
+Fixing the data issues.
+
+* **Explanatory/empty rows at the beginning**
+* **Multiple tables in one sheet**
+* **Multiple header rows**
+
+
+```r
+cols &lt;- xls_data[1,]
+*colnames(xls_data) &lt;- ifelse(grepl('\\.', colnames(xls_data)),
+                             cols,
+                             colnames(xls_data))
+xls_data &lt;- xls_data[2:nrow(xls_data),]
+```
+
+
+```
+## [1] "Year"                       "Total deliveries"          
+## [3] "Person conducting delivery" "Unknown %"                 
+## [5] "Total excl. unknown"        "Hospital doctor %"         
+## [7] "Midwife %"                  "GP / Other %"
+```
+
+---
+
+# Cleaning .xls
+
+Fixing the data issues.
+
+* **Explanatory/empty rows at the beginning**
+* **Multiple tables in one sheet**
+* **Multiple header rows**
+* **R-unfriendly column names**
+
+
+```r
+xls_data &lt;- janitor::clean_names(xls_data)
+```
+
+
+```
+## [1] "year"                       "total_deliveries"          
+## [3] "person_conducting_delivery" "unknown_percent"           
+## [5] "total_excl_unknown"         "hospital_doctor_percent"   
+## [7] "midwife_percent"            "gp_other_percent"
+```
+---
+
+# Cleaning .xls
+
+Finished result!
+
+&lt;table class="table" style="font-size: 7px; width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; year &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; total_deliveries &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; person_conducting_delivery &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; unknown_percent &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; total_excl_unknown &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; hospital_doctor_percent &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; midwife_percent &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; gp_other_percent &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 1989-90 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 633500 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; − &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; − &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; − &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.23699999999999999 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.75599999999999989 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.0080000000000000002 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 1990-91 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 652100 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; − &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; − &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; − &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.245 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.748 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.0060000000000000001 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 1991-92 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 643800 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; − &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; − &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; − &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.251 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.74299999999999999 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.0069999999999999993 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 1992-93 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 624600 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; − &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; − &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; − &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.253 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.73999999999999999 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.0069999999999999993 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 1993-94 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 620200 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; − &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; − &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; − &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.26100000000000001 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.73299999999999998 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.0060000000000000001 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 1994-95 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 604300 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; − &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; − &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; − &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.27200000000000002 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.72299999999999998 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.0050000000000000001 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 1995-96 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 592600 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; − &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; − &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; − &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.28100000000000003 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.71099999999999997 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.0069999999999999993 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 1996-97 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 594500 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; − &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; − &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; − &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.28399999999999997 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.70799999999999996 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.0090000000000000011 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 1997-98 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 585000 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; − &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; − &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; − &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.29999999999999999 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.69400000000000006 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.0069999999999999993 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 1998-99 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 577500 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; − &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; − &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; − &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.311 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.68099999999999994 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.0080000000000000002 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 1999-00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 565300 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; − &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; − &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; − &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.32500000000000001 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.66900000000000004 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.0060000000000000001 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2000-01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 549600 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; − &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; − &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; − &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.33299999999999996 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.66200000000000003 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.0050000000000000001 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2001-02 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 541700 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; − &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; − &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; − &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.33799999999999997 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.65400000000000003 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.0069999999999999993 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2002-03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 548000 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; − &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; − &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; − &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.33299999999999996 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.66099999999999992 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.0060000000000000001 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2003-04 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 575900 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; − &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; − &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; − &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.33500000000000002 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.66099999999999992 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.0040000000000000001 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2004-05 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 584100 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; − &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; − &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; − &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.35700000000000004 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.63700000000000001 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.0060000000000000001 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2005-06 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 593400 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; − &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; − &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; − &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.35499999999999998 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.64000000000000001 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.0050000000000000001 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Updated methodology** &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2005-06 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 611337 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 198822 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.3252248759685738 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 412515 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.34499999999999997 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.622 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.034000000000000002 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2006-07 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 629207 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 209097 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.33231829906533145 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 420110 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.34999999999999998 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.61699999999999999 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.032000000000000001 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2007-08 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 649837 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 254255 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.39125965434408938 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 395582 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.36200000000000004 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.60299999999999998 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.035000000000000003 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2008-09 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 652638 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 155058 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.23758653342281633 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 497580 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.38799999999999996 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.56799999999999995 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.044000000000000004 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2009-10 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 652377 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 89675 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.13745886197704701 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 562702 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.39000000000000001 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.56299999999999994 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.047 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2010-11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 668195 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 88506 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.13245534611902215 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 579689 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.38299999999999995 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.56600000000000006 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.050999999999999997 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2011-12 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 668936 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 79451 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.11877219943312962 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 589485 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.38380790011620314 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.56620609515085196 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.049986004732944858 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2012-13 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 671255 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 94276 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.14044737096930376 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 576979 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.39250995270191807 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.56934654467493617 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.038143502623145732 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2013-14 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 646904 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 116579 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.18021066495183211 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 530325 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.39706595012492341 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.55569697826804321 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.047237071607033422 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2014-15 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 636643 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 119093 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.1870640217515939 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 517550 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.38934595691237561 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.53452420056033234 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.076129842527292046 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2015-16 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 648107 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 120374 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.18573167702246696 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 527733 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.38680355406995581 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.53032688878656442 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.082869557143479752 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2016-17 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 636401 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 126448 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.1986923339215369 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 509953 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.38694742456657771 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.52283837922318332 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.090214196210238989 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2017-18 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 626203 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 139941 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.22347545444528372 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 486262 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.39121913700844402 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.5134865566299649 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.095294306361591072 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+
+# Importing .xlsx
+
+You already know!
+
+
+```r
+xlsx_data &lt;- readxl::read_excel('xlsx_data.xlsx', sheet = 1)
+```
+
+.pull-right[![](https://media1.giphy.com/media/NEQrYh7YTy4MM/source.gif)]
+
+---
+
+# Importing .zip
+
+Mainly for really big data files, or multiple files that belong together.
+
+
+```r
+downloader::download('https://files.digital.nhs.uk/9A/6C3480/Seven-day%20Services%20data%20files%2C%20Oct17-Sep18.zip',
+                     dest = 'seven_day_service.zip', mode = 'wb')
+*unzip('seven_day_service.zip')
+```
+
+![](https://i.imgur.com/dOrdnZi.png)
+
+---
+
+class: inverse
+
+# What if my data still doesn't cooperate?
+
+
+---
+
+# Handling common data problems
+
+* **Not the right number of columns?**
+
+Some countries use different standard delimiters (for example, tab-delimited data). Rather than read_csv, you can specify the delimiter using this function:
+
+
+```r
+data &lt;- read.table('data.txt', sep = "\t")
+```
+
+--
+
+* **Weird decimals?**
+
+Some countries use commas instead of dots to indicate decimal points. 
+
+
+```r
+data &lt;- read.table('data.txt', dec = ",")
+```
+
+--
+
+* **Missing values messing with your datatypes?**
+
+Statistical disclosure rules often result in '-' or similar strings inside numeric columns. Make sure they stay numeric by specifying which strings can be turned into 'NA's.
+
+
+```r
+data &lt;- read.table('data.txt', na.strings = c("-", "?", '0'))
+```
+
+---
+
+# Why bother?
+
+## REPRODUCIBILITY
+
+Next time, your colleague only has to change the URL and maybe a few parameters to arrive at exactly the same dataset you did. This allows for:
+
+* Sharing your work (the URL is the same for everyone)
+* QA'ing your methods as separate from the results
+* Re-running your analysis later
+* Remembering exactly what steps you took to get to your final dataset
+
+.center[![](https://phdcomics.com/comics/archive/phd031214s.gif)]
+
+---
+
+# Exercise!
+
+Have a go at programmatically importing data from any of the files inside the Seven-Day Services zip file. 
+
+.center[https://digital.nhs.uk/data-and-information/publications/clinical-indicators/seven-day-services/archive/mi-seven-day-services---england-october-2017---september-2018
+
+https://bit.ly/338FOCf
+
+![](https://media2.giphy.com/media/yR4xZagT71AAM/giphy.gif)]
+
+---
+
+# Example: Seven-day Services length of stay
+
+**Download ZIP file**
+
+```r
+downloader::download('https://files.digital.nhs.uk/9A/6C3480/Seven-day%20Services%20data%20files%2C%20Oct17-Sep18.zip',
+                     dest = 'seven_day_service.zip', mode = 'wb')
+unzip('seven_day_service.zip')
+```
+
+--
+
+**Import correct .xlsx file (sheet 2 = Data)**
+
+
+```r
+sevenday_data &lt;- readxl::read_excel('Seven-day Services length of stay indicator, Oct17-Sep18 (xlsx).xlsx', 
+                                    sheet = 2)
+```
+
+```
+## New names:
+## * `` -&gt; ...2
+## * `` -&gt; ...3
+## * `` -&gt; ...4
+## * `` -&gt; ...5
+## * `` -&gt; ...6
+## * … and 38 more problems
+```
+
+---
+
+# Example: Seven-day Services length of stay
+
+![](https://i.imgur.com/gSe1THd.png)
+
+
+**Skip explanatory rows**
+
+
+```r
+sevenday_data &lt;- readxl::read_excel('Seven-day Services length of stay indicator, Oct17-Sep18 (xlsx).xlsx', 
+                                    sheet = 2, 
+*                                   skip = 15)
+```
+
+
+---
+
+# Example: Seven-day Services length of stay
+
+**Three lines of headers!**
+
+
+```r
+headers &lt;- data.frame(head1 = colnames(sevenday_data),
+              head2 = as.character(as.vector(sevenday_data[1,])),
+              head3 = as.character(as.vector(sevenday_data[2,])),
+              stringsAsFactors = FALSE) %&gt;%
+  dplyr::mutate(head1 = ifelse(grepl('\\.', head1), NA, head1))
+```
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; head1 &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; head2 &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; head3 &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Trust code &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Trust name &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Monday &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Median length of stay (days) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Number of spells with a length of stay of: &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0 days &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1 day &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2 days &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 3 days &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 4 or more days &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Tuesday &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Median length of stay (days) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Number of spells with a length of stay of: &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0 days &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1 day &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2 days &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 3 days &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 4 or more days &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Wednesday &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Median length of stay (days) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Number of spells with a length of stay of: &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0 days &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1 day &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2 days &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 3 days &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 4 or more days &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Thursday &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Median length of stay (days) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Number of spells with a length of stay of: &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0 days &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1 day &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2 days &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 3 days &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 4 or more days &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Friday &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Median length of stay (days) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Number of spells with a length of stay of: &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0 days &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1 day &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2 days &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 3 days &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 4 or more days &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Saturday &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Median length of stay (days) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Number of spells with a length of stay of: &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0 days &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1 day &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2 days &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 3 days &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 4 or more days &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Sunday &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Median length of stay (days) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Number of spells with a length of stay of: &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0 days &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1 day &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2 days &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 3 days &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 4 or more days &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+
+# Example: Seven-day Services length of stay
+
+**Three lines of headers!**
+
+
+```r
+headers &lt;- headers %&gt;%
+* tidyr::fill(head1:head2) %&gt;%
+  dplyr::group_by(head1) %&gt;%
+  tidyr::fill(head3) %&gt;%
+  dplyr::ungroup() %&gt;%
+  dplyr::mutate(colname = paste0(head1, ' ', 
+                                 ifelse(is.na(head2), '', head2), ' ', 
+                                 ifelse(is.na(head3), '', head3)))
+```
+
+
+```
+##  [1] "Trust code  "                                                       
+##  [2] "Trust name  "                                                       
+##  [3] "Monday Median length of stay (days) "                               
+##  [4] "Monday Number of spells with a length of stay of: 0 days"           
+##  [5] "Monday Number of spells with a length of stay of: 1 day"            
+##  [6] "Monday Number of spells with a length of stay of: 2 days"           
+##  [7] "Monday Number of spells with a length of stay of: 3 days"           
+##  [8] "Monday Number of spells with a length of stay of: 4 or more days"   
+##  [9] "Tuesday Median length of stay (days) "                              
+## [10] "Tuesday Number of spells with a length of stay of: 0 days"          
+## [11] "Tuesday Number of spells with a length of stay of: 1 day"           
+## [12] "Tuesday Number of spells with a length of stay of: 2 days"          
+## [13] "Tuesday Number of spells with a length of stay of: 3 days"          
+## [14] "Tuesday Number of spells with a length of stay of: 4 or more days"  
+## [15] "Wednesday Median length of stay (days) "                            
+## [16] "Wednesday Number of spells with a length of stay of: 0 days"        
+## [17] "Wednesday Number of spells with a length of stay of: 1 day"         
+## [18] "Wednesday Number of spells with a length of stay of: 2 days"        
+## [19] "Wednesday Number of spells with a length of stay of: 3 days"        
+## [20] "Wednesday Number of spells with a length of stay of: 4 or more days"
+## [21] "Thursday Median length of stay (days) "                             
+## [22] "Thursday Number of spells with a length of stay of: 0 days"         
+## [23] "Thursday Number of spells with a length of stay of: 1 day"          
+## [24] "Thursday Number of spells with a length of stay of: 2 days"         
+## [25] "Thursday Number of spells with a length of stay of: 3 days"         
+## [26] "Thursday Number of spells with a length of stay of: 4 or more days" 
+## [27] "Friday Median length of stay (days) "                               
+## [28] "Friday Number of spells with a length of stay of: 0 days"           
+## [29] "Friday Number of spells with a length of stay of: 1 day"            
+## [30] "Friday Number of spells with a length of stay of: 2 days"           
+## [31] "Friday Number of spells with a length of stay of: 3 days"           
+## [32] "Friday Number of spells with a length of stay of: 4 or more days"   
+## [33] "Saturday Median length of stay (days) "                             
+## [34] "Saturday Number of spells with a length of stay of: 0 days"         
+## [35] "Saturday Number of spells with a length of stay of: 1 day"          
+## [36] "Saturday Number of spells with a length of stay of: 2 days"         
+## [37] "Saturday Number of spells with a length of stay of: 3 days"         
+## [38] "Saturday Number of spells with a length of stay of: 4 or more days" 
+## [39] "Sunday Median length of stay (days) "                               
+## [40] "Sunday Number of spells with a length of stay of: 0 days"           
+## [41] "Sunday Number of spells with a length of stay of: 1 day"            
+## [42] "Sunday Number of spells with a length of stay of: 2 days"           
+## [43] "Sunday Number of spells with a length of stay of: 3 days"           
+## [44] "Sunday Number of spells with a length of stay of: 4 or more days"
+```
+
+---
+
+# Example: Seven-day Services length of stay
+
+**Re-import with correct headers**
+
+
+```r
+sevenday_data &lt;- readxl::read_excel('Seven-day Services length of stay indicator, Oct17-Sep18 (xlsx).xlsx', 
+                                    sheet = 2, 
+*                                   skip = 18,
+*                                   col_names = headers$colname)
+```
+
+--
+
+**Unhelpful missing values**
+
+
+```r
+sevenday_data &lt;- readxl::read_excel('Seven-day Services length of stay indicator, Oct17-Sep18 (xlsx).xlsx', 
+                                    sheet = 2, skip = 18,
+                                    col_names = headers$colname,
+*                                   na = '*')
+```
+
+---
+
+# Example: Seven-day Services length of stay
+
+**Make headers R-friendly**
+
+```r
+sevenday_data &lt;- janitor::clean_names(sevenday_data)
+```
+
+
+```
+##  [1] "trust_code"                                                     
+##  [2] "trust_name"                                                     
+##  [3] "monday_median_length_of_stay_days"                              
+##  [4] "monday_number_of_spells_with_a_length_of_stay_of_0_days"        
+##  [5] "monday_number_of_spells_with_a_length_of_stay_of_1_day"         
+##  [6] "monday_number_of_spells_with_a_length_of_stay_of_2_days"        
+##  [7] "monday_number_of_spells_with_a_length_of_stay_of_3_days"        
+##  [8] "monday_number_of_spells_with_a_length_of_stay_of_4_or_more_days"
+##  [9] "tuesday_median_length_of_stay_days"                             
+## [10] "tuesday_number_of_spells_with_a_length_of_stay_of_0_days"
+```
+
+---
+
+# Workable data!
+
+&lt;table class="table" style="font-size: 7px; width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; trust_code &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; trust_name &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; monday_median_length_of_stay_days &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; monday_number_of_spells_with_a_length_of_stay_of_0_days &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; monday_number_of_spells_with_a_length_of_stay_of_1_day &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; monday_number_of_spells_with_a_length_of_stay_of_2_days &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; monday_number_of_spells_with_a_length_of_stay_of_3_days &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; monday_number_of_spells_with_a_length_of_stay_of_4_or_more_days &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; tuesday_median_length_of_stay_days &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; tuesday_number_of_spells_with_a_length_of_stay_of_0_days &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; tuesday_number_of_spells_with_a_length_of_stay_of_1_day &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; tuesday_number_of_spells_with_a_length_of_stay_of_2_days &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; tuesday_number_of_spells_with_a_length_of_stay_of_3_days &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; tuesday_number_of_spells_with_a_length_of_stay_of_4_or_more_days &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; wednesday_median_length_of_stay_days &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; wednesday_number_of_spells_with_a_length_of_stay_of_0_days &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; wednesday_number_of_spells_with_a_length_of_stay_of_1_day &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; wednesday_number_of_spells_with_a_length_of_stay_of_2_days &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; wednesday_number_of_spells_with_a_length_of_stay_of_3_days &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; wednesday_number_of_spells_with_a_length_of_stay_of_4_or_more_days &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; thursday_median_length_of_stay_days &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; thursday_number_of_spells_with_a_length_of_stay_of_0_days &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; thursday_number_of_spells_with_a_length_of_stay_of_1_day &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; thursday_number_of_spells_with_a_length_of_stay_of_2_days &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; thursday_number_of_spells_with_a_length_of_stay_of_3_days &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; thursday_number_of_spells_with_a_length_of_stay_of_4_or_more_days &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; friday_median_length_of_stay_days &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; friday_number_of_spells_with_a_length_of_stay_of_0_days &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; friday_number_of_spells_with_a_length_of_stay_of_1_day &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; friday_number_of_spells_with_a_length_of_stay_of_2_days &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; friday_number_of_spells_with_a_length_of_stay_of_3_days &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; friday_number_of_spells_with_a_length_of_stay_of_4_or_more_days &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; saturday_median_length_of_stay_days &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; saturday_number_of_spells_with_a_length_of_stay_of_0_days &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; saturday_number_of_spells_with_a_length_of_stay_of_1_day &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; saturday_number_of_spells_with_a_length_of_stay_of_2_days &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; saturday_number_of_spells_with_a_length_of_stay_of_3_days &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; saturday_number_of_spells_with_a_length_of_stay_of_4_or_more_days &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; sunday_median_length_of_stay_days &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; sunday_number_of_spells_with_a_length_of_stay_of_0_days &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; sunday_number_of_spells_with_a_length_of_stay_of_1_day &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; sunday_number_of_spells_with_a_length_of_stay_of_2_days &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; sunday_number_of_spells_with_a_length_of_stay_of_3_days &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; sunday_number_of_spells_with_a_length_of_stay_of_4_or_more_days &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; ENG &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; ENGLAND &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 321179 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 186042 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 98473 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 67480 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 277328 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 321274 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 186162 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 99578 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 76858 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 278776 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 317700 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 185749 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 108909 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 44591 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 292537 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 318047 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 197799 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73137 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 39833 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 319313 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 327825 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 170377 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73804 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 67544 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 319019 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 215662 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 148114 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 79713 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 58018 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 247602 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 208140 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 150815 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 80425 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 54362 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 226764 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; RTQ &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2GETHER NHS FOUNDATION TRUST &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 22 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 105 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 34 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 135 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 22 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 135 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 32 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 155 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 32.5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 165 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 23.5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 110 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 17 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 75 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; REM &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; AINTREE UNIVERSITY HOSPITAL NHS FOUNDATION TRUST &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3525 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1125 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 760 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 505 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2040 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3580 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1220 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 765 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 575 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2085 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3630 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1220 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 855 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 345 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2255 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3435 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1320 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 585 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 330 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2480 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3340 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1155 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 510 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 530 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2460 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2160 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 950 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 525 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 440 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1770 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2205 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 950 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 590 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 395 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1620 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; RCF &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; AIREDALE NHS FOUNDATION TRUST &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1590 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 760 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 335 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 260 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 975 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1415 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 740 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 350 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 260 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 905 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1395 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 725 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 410 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 175 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 990 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1350 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 770 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 280 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 140 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1025 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1460 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 685 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 270 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 245 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1060 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 685 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 595 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 270 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 195 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 790 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 805 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 595 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 295 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 210 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 740 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.pull-right[![](https://media2.giphy.com/media/lSbTmUmQwxUmiExV4h/giphy.gif)]
+
+---
+
+# Using the data
+
+.center[
+&lt;img src="Importing_data_files/figure-html/show data use-1.svg" width="650px" height="400px" /&gt;
+]
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  /* Replace <script> tags in slides area to make them executable
+   *
+   * Runs after post-processing of markdown source into slides and replaces only
+   * <script>s on the last slide of continued slides using the .has-continuation
+   * class added by xaringan. Finally, any <script>s in the slides area that
+   * aren't executed are commented out.
+   */
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container:not(.has-continuation) script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+  var scriptsNotExecuted = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container.has-continuation script'
+  );
+  if (!scriptsNotExecuted.length) return;
+  for (var i = 0; i < scriptsNotExecuted.length; i++) {
+    var comment = document.createComment(scriptsNotExecuted[i].outerHTML)
+    scriptsNotExecuted[i].parentElement.replaceChild(comment, scriptsNotExecuted[i])
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

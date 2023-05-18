@@ -1,0 +1,196 @@
+---
+title: 'R Coffee & Coding: typical R errors'
+author: "Jovita Brundziene"
+date: "21 January 2021"
+output: html_document
+---
+
+##Typical R code errors
+
+There are various errors that R can show in the console if something's not right with the code, e.g. you missed a bracket, the name of the file is wrong etc. Today we'll go through a few most common ones.
+
+**Can't set working directory**
+
+Here, I'm trying to reset the working directory to a different location. The code would be absolutely fine, but the location does not exist as there is no such folder titled 'Session 36 - 20201106' yet, as we're still on session 35! So R tells you that it cannot change the working directory. Unhelpfully it does not explain why, but now you know!
+
+```{r message=FALSE, warning=FALSE, paged.print=FALSE}
+#check working directory
+getwd()
+```
+
+The below throws up an error:
+```{r error=TRUE}
+#Set the working directory to the desired location
+setwd("C:/R/Coffee & Codin")
+```
+
+But this works as we specified the right name of the directory
+```{r error=TRUE}
+#Set the working directory to the desired location
+setwd("C:/R/Coffee & Coding")
+getwd()
+```
+
+I also noticed that if your laptop has not fully connected to your shared directory drives (it will have a red x next to the drive name in the folder explorer), R will not be able to set the working directory. So make sure you're fully connected!
+
+**Can't load file**
+
+Another common R error is when it does not allow you to load the file from your working directory. There's normally one of two reasons why this happens:
+
+R may tell you that it cannot find the *read_csv* function. This means that you did not load the relevant package, in this case *tidyverse*.
+
+```{r error=TRUE}
+#Load csv from working directory
+data <- read_csv("HCHS_staff_in_NHS_Trusts_and_CCGs_Sep_2019.csv")
+```
+
+```{r message=FALSE, warning=FALSE, paged.print=FALSE}
+#load package
+library(tidyverse)
+```
+
+R may also tell you that the file does not exist in the set location (working directory). It's most likely that you misspelt the name, which I have here, as it should be 2018, not 2019).
+
+```{r error=TRUE}
+#Load csv from working directory
+data <- read_csv("HCHS_staff_in_NHS_Trusts_and_CCGs_Sep_2019.csv")
+```
+
+Fixing the file name, allows you to load the dataset.
+
+```{r error=TRUE}
+#Load csv from working directory
+data <- read_csv("HCHS_staff_in_NHS_Trusts_and_CCGs_Sep_2018.csv")
+```
+
+**Wrong function name**
+
+With the below code I was trying to sum the number of staff in the file. But given that I misspelt the function name 'summarise' R tells me that such a function does not exist. Another solution would be to check that you loaded the package when you opened a new R session, as it will show a similar error.
+
+```{r error=TRUE}
+#summarise data
+data %>% sumarise(sum(FTE))
+```
+
+Fixing the function name allows to run the code.
+
+```{r error=TRUE}
+#summarise data
+data %>% summarise(sum(FTE))
+```
+
+**Can't sum data**
+
+The most common issue when trying to aggregate data is missing values. If you have missing values, R will return an NA sum for your command. To deal with this, the easiest solution is to simply filter out the missing values and then some the data, as below.
+
+```{r error=TRUE}
+#summarise data
+data %>%
+  filter(is.na(FTE)==FALSE) %>%
+  summarise(sum(FTE))
+```
+
+Alternatively, you could override the NAs with zeros, using a combination of *is.na*, *if_else* and *mutate* functions.
+
+**Missed a bracket**
+
+Another unhelpful R error is when it just reports a blank error or an 'unexpected end of input'. Here normally a good indication is code grammar issues, so here I missed a bracket at the end of the code.
+
+```{r error=TRUE}
+#summarise data
+data %>% summarise(sum(FTE)
+```
+
+Adding the bracket allows to run the code with an error.
+
+```{r error=TRUE}
+#summarise data
+data %>% summarise(sum(FTE))
+```
+
+**Wrong variable name**
+
+R is pretty good at telling you if it can't find something. So if you receive the below error, you're likely either specified a variable that does not exist or misspelt the name here as I have. It should be FTE instead of FTEs.
+
+```{r error=TRUE}
+#summarise data
+data %>% summarise(sum(FTEs))
+```
+
+Fixing the spelling of the vriable names, runs the code without errors.
+
+```{r error=TRUE}
+#summarise data
+data %>% summarise(sum(FTE))
+```
+
+**Wrong data type**
+
+Another error R may throw at you is if the variable you're using is not in the right data type. For example, below I was trying to sum the Grade variable, but because it's recorded as a character/ string, R does not allow this. Also it doesn't quite make sense to sum this variable, as it's text rather than numbers, but you see the point I'm trying to make here. So you either need to select a numeric variable and sum it or use a count function for a string variable.
+
+```{r error=TRUE}
+#summarise data
+data %>% summarise(sum(Grade))
+```
+
+Grouping by the string variable and summing the numeric one, runs ok.
+
+```{r error=TRUE}
+#summarise data
+data %>%
+  group_by(Grade) %>%
+  summarise(sum(FTE))
+```
+
+**Missing quotes**
+
+Another rooky mistake is to forget to put quotes around string values, when you're trying to filter the variable. R will return the below awkward error.
+
+```{r error=TRUE}
+#filter data
+data %>% filter(Grade==Band 5)
+```
+
+Fixed version with quotes around the string value:
+
+```{r error=TRUE}
+#filter data
+data %>% filter(Grade=='Band 5')
+```
+
+**Used = instead of ==**
+
+Similarly, if you forget to use double == when filtering data, R will be helpful in this case and suggest double ==. Remember single = assigns an object (e.g. when you create a new dataset), whereas double == is used to test equality of values.
+
+```{r error=TRUE}
+#filter data
+data %>% filter(Grade='Band 5')
+```
+
+**Forgot a comma**
+
+Another common mistake is to forget a comma between variables, when for example you're grouping by multiple variables. You will note that R returns a similar error message as the one with missing quotes. R signals here that you forgot to add a certain symbol to your code.
+
+```{r error=TRUE}
+#group data
+data %>% group_by(Month Grade) %>%
+  summarise(sum(FTE))
+```
+
+```{r error=TRUE}
+#group data
+data %>% group_by(Month, Grade) %>%
+  summarise(sum(FTE))
+```
+
+**Key things to check**
+
+So key things to check if you don't quite understand what the errors are saying:
+
+1. Have I misspell something like the function or variable name. Note R is case sensitive!
+2. Have I missed a bracket or an operator like =
+3. Am I using the right function for the command
+4. Are you disconnected from the shared drives?
+5. If everything else looks OK, just do a quick google, stackoverflow will always have an answer!
+
+Happy coding!
