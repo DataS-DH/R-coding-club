@@ -1,0 +1,455 @@
+---
+title: 'Data wrangling with dplyr'
+author: "Martine Wauben"
+institute: "DHSC"
+date: "2020-03-09 (updated: `r Sys.Date()`)"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include = FALSE}
+library(magrittr)
+library(dplyr)
+library(NHSRdatasets)
+library(knitr)
+library(ggplot2)
+library(scales)
+```
+
+
+class: inverse
+
+# Session overview
+
+* What is the tidyverse?
+* What is the %>%?
+* The dplyr package
+* The main functions
+    * select()
+    * arrange()
+    * filter()
+    * mutate()
+    * summarise()
+    * group_by()
+* Recap & exercises
+
+---
+
+# What is the tidyverse?
+
+![](https://i.imgur.com/cdzUNDL.png)
+
+---
+
+# What is the %>%?
+
+Structures sequence of operations from left to right, rather than inside out!
+* Avoids nested function calls
+* Minimises need for local variables
+* Easy to add steps halfway through if you forgot something
+* No painful parenthesis-counting
+
+--
+
+```{r no pipes, eval = FALSE}
+nested_outcome <- h(g(f(x)))
+
+step1_outcome <- f(x)
+step2_outcome <- g(step1_outcome)
+step3_outcome <- h(step2_outcome)
+```
+
+--
+
+**is the same as**
+
+```{r pipes, eval = FALSE}
+piped_outcome <- x %>% 
+  f() %>% 
+  g() %>% 
+  h()
+```
+
+---
+
+# The dplyr package
+
+Consistent format of working with tidy data (a column per variable, a row per observation):
+
+* First argument is a dataframe
+* Subsequent argument describes what to do with that dataframe
+* Returns a dataframe
+
+.pull-right[<img src='https://github.com/allisonhorst/stats-illustrations/blob/master/rstats-artwork/dplyr_wrangling.png?raw=true' width = '800px' height = '400px'>]
+
+---
+
+# What does this do?
+
+```{r dplyr example, eval = FALSE}
+outcome <- data %>%
+  filter(country == 'UK') %>%
+  select(trust_id, year, region, male, female) %>%
+  mutate(patients = male + female) %>%
+  group_by(region, year) %>%
+  summarise(avg_patients = mean(patients)) %>%
+  ungroup() %>%
+  arrange(year)
+```
+
+---
+
+# Getting started
+
+Install dplyr and magrittr (for the pipe)
+
+```{r install, eval = FALSE}
+install.packages(c('dplyr', 'magrittr'))
+```
+
+Load libraries
+
+```{r libraries}
+library(dplyr)
+library(magrittr)
+```
+
+.pull-right[![](https://media1.giphy.com/media/bkvdYeBEGeSE8/giphy.gif)]
+
+---
+
+# Data for today
+
+Simulated A&E attendances data, courtesy of the NHS R Community. 
+
+```{r install nhsR, eval = FALSE}
+install.packages('NHSRdatasets')
+```
+
+```{r nhsRpackage}
+ae <- NHSRdatasets::ae_attendances
+```
+
+```{r show, echo = FALSE}
+knitr::kable(ae[1:5,], format = 'html')
+```
+
+---
+
+# select()
+
+**Pick specific columns**
+
+```{r select named}
+ae %>%
+  dplyr::select(period, attendances) %>%
+  head()
+```
+
+**Drop specific columns**
+
+```{r remove named, eval = FALSE}
+ae %>%
+  dplyr::select(-type)
+```
+
+
+---
+
+# select() helper functions 
+
+* starts_with()
+* ends_with()
+* contains()
+* matches(<regex>)
+* -c(variable1, variable2) to remove multiple columns
+
+
+```{r select ends}
+ae %>%
+  dplyr::select(ends_with('s')) %>%
+  head()
+```
+
+---
+
+# arrange()
+
+Default: sort in ascending order and NA's at the end. 
+
+```{r sorting}
+ae %>%
+  arrange(attendances, desc(period)) %>%
+  head()
+```
+
+---
+
+# filter()
+
+```{r filtering}
+ae %>%
+  dplyr::filter(type == '1') %>%
+  head()
+```
+
+--
+
+Why **'1'** and not **1**?
+
+```{r, echo = FALSE}
+str(ae[, 'type'])
+```
+
+---
+
+# filter(): Boolean operators
+
+![](https://d33wubrfki0l68.cloudfront.net/01f4b6d39d2be8269740a3ad7946faa79f7243cf/8369a/diagrams/transform-logical.png)
+
+x is the left-hand circle; y is the right-hand circle. 
+
+You can also use brackets, the way you would in mathematics. 
+
+---
+
+# mutate()
+
+<img src='https://github.com/allisonhorst/stats-illustrations/blob/master/rstats-artwork/dplyr_mutate.png?raw=true' height = '400px' width = '700px'>
+
+---
+
+# mutate()
+
+Calculate a column, which is added onto the end of the dataframe.
+
+```{r mutating}
+ae %>%
+  dplyr::mutate(prop_breach = breaches / attendances) %>%
+  head()
+```
+
+---
+
+# mutate() helper functions
+
+* Arithmetic operators (**+, -, *, /, ^**)
+* Log functions (like **log10()**)
+* Offsets (like **lead()** and **lag()**)
+* Logical comparisons (**<, <=, >, >=, !=, and %in%**)
+* ifelse statement (if more than 1 logical split: **dplyr::case_when()**)
+* Cumulative and rolling aggregates using **{zoo}**
+* Check **mutate_at** and **mutate_if**
+
+```{r mutate example}
+ae %>%
+  dplyr::mutate_if(is.factor, as.character) %>%
+  str()
+```
+
+---
+
+# summarise()
+
+```{r summarise}
+ae %>%
+  dplyr::summarise(avg_attendance = mean(attendances),
+                   sd_attendance = sd(attendances))
+```
+
+--
+
+```{r summarise if}
+ae %>%
+  dplyr::summarise_if(is.numeric, list(mean = mean, 
+                                       sd = sd)) %>%
+  t()
+```
+
+---
+
+# group_by()
+
+```{r group}
+ae %>%
+  dplyr::group_by(period) %>%
+  dplyr::summarise(tot_att = sum(attendances),
+                   tot_breach = sum(breaches)) %>%
+  dplyr::ungroup() %>%
+  head()
+```
+
+---
+
+# group_by()
+
+```{r group power}
+ae %>%
+  dplyr::group_by(period, type) %>%
+  dplyr::summarise_if(is.numeric, sum) %>%
+  dplyr::mutate(tot_att = sum(attendances)) %>% #<<
+  dplyr::mutate(prop_type = attendances / tot_att) %>%
+  dplyr::select(period, type, attendances, tot_att, prop_type) %>%
+  head()
+```
+
+---
+
+# group_by()
+
+.center[
+```{r group plot, echo = FALSE, fig.height = 3, dev = 'svg'}
+ae %>%
+  dplyr::group_by(period, type) %>%
+  dplyr::summarise_if(is.numeric, sum) %>%
+  dplyr::mutate(tot_att = sum(attendances)) %>% #<<
+  dplyr::mutate(prop_type = attendances / tot_att) %>%
+  dplyr::select(period, type, attendances, tot_att, prop_type) %>%
+  ggplot(aes(x = period, y = prop_type, fill = type))+
+  geom_bar(stat = 'identity', position = 'stack')+
+  scale_y_continuous(labels = scales::percent)+
+  labs(title = 'Proportion of attendances per organisation type',
+       x = '', 
+       y = 'Proportion of attendances')+
+  theme_minimal()
+```
+
+]
+
+---
+
+# Functions recap
+
+<img src='https://itsalocke.com/blog/img/dplyr_schema.png' height = '400px' width = '700px'>
+
+Source: https://itsalocke.com/blog/data-manipulation-in-r/
+
+---
+
+# Exercises
+
+Load the NHSRdatasets data
+
+```{r install nhsR ex, eval = FALSE}
+install.packages('NHSRdatasets')
+ae <- NHSRdatasets::ae_attendances
+```
+
+### Challenges:
+
+* The organisation with the most attendances in 2017
+* The type of organisation with the highest average admission-to-attendance ratio
+* In 2018, how many organisations had more than 1000 breaches in at least one month?
+
+### If you finish early:
+* Which year had the most admissions?
+* Are there more breaches during the winter months?
+
+---
+
+# Exercises: answers
+
+* The organisation with the most attendances in 2017
+
+--
+
+```{r ex 1}
+ae %>%
+  dplyr::filter(period >= '2017-01-01' & period < '2018-01-01') %>%
+  dplyr::group_by(org_code) %>%
+  dplyr::summarise(tot_att_17 = sum(attendances)) %>%
+  dplyr::arrange(desc(tot_att_17)) %>%
+  head()
+```
+
+---
+
+# Exercises: answers
+
+* The type of organisation with the highest average admission-to-attendance ratio
+
+--
+
+```{r ex 2}
+ae %>%
+  dplyr::mutate(ratio = admissions / attendances) %>%
+  dplyr::group_by(type) %>%
+  dplyr::summarise(avg_ratio = mean(ratio)) %>%
+  dplyr::arrange(desc(avg_ratio)) %>%
+  head()
+```
+
+---
+
+# Exercises: answers
+
+* In 2018, how many organisations had more than 1000 breaches in at least one month?
+
+--
+
+```{r ex 3}
+ae %>%
+  dplyr::filter(period >= '2018-01-01' & period < '2019-01-01') %>%
+  dplyr::group_by(org_code) %>%
+  dplyr::mutate(most_breaches = max(breaches)) %>%
+  dplyr::filter(most_breaches > 1000) %>%
+  dplyr::select(org_code, most_breaches) %>%
+  unique(.) %>%
+  nrow(.)
+```
+
+---
+
+# Exercises: answers
+
+* Which year had the most admissions?
+
+--
+
+```{r ex 4}
+ae %>%
+  dplyr::mutate(year = format(period, '%Y')) %>%
+  dplyr::group_by(year) %>%
+  dplyr::summarise(tot_adm = sum(admissions)) %>%
+  dplyr::arrange(desc(tot_adm))
+```
+
+---
+
+# Exercises: answers
+
+* Are there more breaches during the winter months?
+
+--
+
+```{r ex 5}
+ae %>%
+  dplyr::mutate(month = format(period, '%m')) %>%
+  dplyr::mutate(winter = month %in% c('11', '12', '01', '02')) %>%
+  dplyr::group_by(winter) %>%
+  dplyr::summarise(tot_br = sum(breaches),
+                   tot_months = length(unique(month))) %>%
+  dplyr::mutate(br_per_month = tot_br / tot_months)
+```
+
+---
+
+# Acknowledgments
+
+.pull-left[
+**Art**: [@allison_horst](https://twitter.com/allison_horst) at RStudio
+
+**Data**: NHS R Community - https://nhsrcommunity.com/
+
+**Workshop structure**: R-Ladies Rotterdam GitHub repository - Paloma RS ([@palolili23](https://twitter.com/palolili23))
+]
+
+.pull-right[
+![](https://github.com/allisonhorst/stats-illustrations/blob/master/rstats-artwork/r_first_then.png?raw=true)
+]
+
